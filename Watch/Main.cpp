@@ -42,7 +42,7 @@ void myInit(void)
 
 }
 
-// dessin du premier cube
+// dessin du disque de la montre
 void display1(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -51,8 +51,8 @@ void display1(void)
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurRouge(0.5f));
-	glScalef(17.0, 5.0, 10.0);
-	glutSolidCube(1.0);
+	//glScalef(17.0, 5.0, 10.0);
+	glutSolidCylinder(2.0, 0.5, 50, 50);
 	glPopMatrix();
 	glPopMatrix();
 }
@@ -66,8 +66,12 @@ void display2(void)
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(0.5f));
-	glScalef(9.0, 9.0, 18.0);
-	glutSolidCube(1.0);
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	glTranslatef(0.0, 0.0, 0.5);
+	glutSolidCone(2.0, 1.0, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
 }
@@ -94,7 +98,7 @@ void display(void)
 	glPushMatrix();
 	display1();
 	display2();
-	display3();
+	//display3();
 	glPopMatrix();
 	glFlush();
 	glutSwapBuffers();
@@ -108,7 +112,7 @@ int main(int argc, char** argv)
 	// on travaille en rgba avec un double buffer et en profondeur
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowPosition(300, 300);
-	glutInitWindowSize(250, 250);
+	glutInitWindowSize(400, 350);
 	glutCreateWindow("Test de transparence");
 	myInit();
 	creationMenuBasique();
