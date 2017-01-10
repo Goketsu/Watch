@@ -50,9 +50,9 @@ void display1(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurRouge(0.5f));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(0.5f));
 	//glScalef(17.0, 5.0, 10.0);
-	glutSolidCylinder(2.0, 0.5, 50, 50);
+	glutSolidCylinder(10.0, 1.5, 50, 50);
 	glPopMatrix();
 	glPopMatrix();
 }
@@ -65,11 +65,11 @@ void display2(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(0.5f));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(0.8f));
 	glPushMatrix();
 	//glScalef(9.0, 9.0, 18.0);
-	glTranslatef(0.0, 0.0, 0.5);
-	glutSolidCone(2.0, 1.0, 50, 50);
+	glTranslatef(0.0, 0.0, 1.5);
+	glutSolidCone(10.0, 0.8, 50, 50);
 	//glutSolidCube(1.0);
 	glPopMatrix();
 	glPopMatrix();
@@ -84,9 +84,12 @@ void display3(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleu(0.5f));
-	glScalef(9.0, 9.0, 9.0);
-	glutSolidSphere(1.25, 50, 50);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+
+	glTranslatef(0.0, 4.0, 3.0);
+	glScalef(0.5, 5.0, 0.3);
+	glutSolidOctahedron();
+	//glutSolidSphere(1.25, 50, 50);
 	glPopMatrix();
 	glPopMatrix();
 }
@@ -98,7 +101,7 @@ void display(void)
 	glPushMatrix();
 	display1();
 	display2();
-	//display3();
+	display3();
 	glPopMatrix();
 	glFlush();
 	glutSwapBuffers();
