@@ -7,12 +7,25 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <ctime>
 
 
 #include "ModuleCouleurs.h"
 #include "ModuleManipulateur.h"
 #include "ModuleMenus.h"
 #include "ModuleReshape.h"
+
+//gestion du temps systeme
+void systemTime(void)
+{
+	time_t secondes;
+	struct tm instant;
+
+	time(&secondes);
+	localtime_s(&instant, &secondes);
+
+	printf("%d/%d ; %d:%d:%d\n", instant.tm_mday, instant.tm_mon + 1, instant.tm_hour, instant.tm_min, instant.tm_sec);
+}
 
 // gestion des lumieres et melanges
 void myInit(void)
@@ -127,6 +140,9 @@ int main(int argc, char** argv)
 	glutMotionFunc(motionBasique);
 	glutMouseFunc(sourisBasique);
 	glutDisplayFunc(display);
+	
+	//print du temps systeme
+	systemTime();
 
 	// entrée de la boucle principale
 	glutMainLoop();
