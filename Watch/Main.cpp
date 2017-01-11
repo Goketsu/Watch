@@ -15,16 +15,37 @@
 #include "ModuleMenus.h"
 #include "ModuleReshape.h"
 
+struct tm instant;
+
 //gestion du temps systeme
 void systemTime(void)
 {
 	time_t secondes;
-	struct tm instant;
+	//struct tm instant;
 
 	time(&secondes);
 	localtime_s(&instant, &secondes);
 
 	printf("%d/%d ; %d:%d:%d\n", instant.tm_mday, instant.tm_mon + 1, instant.tm_hour, instant.tm_min, instant.tm_sec);
+}
+
+void myIdle(void)
+{
+	
+	time_t secondes;
+	//struct tm instant;
+	struct tm newInstant;
+
+	time(&secondes); 
+	localtime_s(&newInstant, &secondes);
+	if (&newInstant.tm_sec != &instant.tm_sec)
+	{
+		instant = newInstant;
+		//float angle = (instant.tm_sec / 10) % 360;
+	}
+	printf("new test %d \n", newInstant.tm_sec);
+	printf("test %d \n",instant.tm_sec);
+	glutPostRedisplay(); // reaffiche la scène
 }
 
 // gestion des lumieres et melanges
@@ -99,6 +120,9 @@ void display3(void)
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 
+	float angle = (instant.tm_sec * 6) % 360;
+	glRotatef(angle, 0.0, 0.0, -0.5);
+
 	glTranslatef(0.0, 4.0, 3.0);
 	glScalef(0.5, 5.0, 0.3);
 	glutSolidOctahedron();
@@ -123,6 +147,10 @@ void display(void)
 
 int main(int argc, char** argv)
 {
+	printf("ca craint");
+	//glutIdleFunc(myIdle);
+	//printf("c'est le début");
+
 	/* Gestion de creation de fenetre*/
 	glutInit(&argc, argv);
 	// on travaille en rgba avec un double buffer et en profondeur
@@ -134,6 +162,9 @@ int main(int argc, char** argv)
 	creationMenuBasique();
 	setParametresOrthoBasique(-11.0, 11.0, -11.0, 11.0, -500.0, 500.0);
 	setManipulateurDistance(1.0f);
+
+	glutIdleFunc(myIdle);
+
 	glutReshapeFunc(reshapeOrthoBasique);
 	glutKeyboardFunc(keyBasique);
 	glutSpecialFunc(specialBasique);
