@@ -84,14 +84,20 @@ void display1(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(0.5f));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
 	//glScalef(17.0, 5.0, 10.0);
+
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, 0.75);
+	glutSolidTorus(0.75,10.0,50,50);
+	glPopMatrix();
+
 	glutSolidCylinder(10.0, 1.5, 50, 50);
 	glPopMatrix();
 	glPopMatrix();
 }
 
-// dessin du deuxieme cube
+// dessin du verre
 void display2(void)
 {
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -110,7 +116,7 @@ void display2(void)
 	glPopMatrix();
 }
 
-// dessin du deuxieme cube
+// dessin de l'aiguille des secondes
 void display3(void)
 {
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -118,12 +124,33 @@ void display3(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
 	float angle = (instant.tm_sec * 6) % 360;
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 4.0, 3.0);
+	glTranslatef(0.0, 4.5, 2.4);
+	glScalef(0.5, 5.0, 0.3);
+	glutSolidOctahedron();
+	//glutSolidSphere(1.25, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+}
+
+// dessin de l'aiguille des minutes
+void display3(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
+
+	float angle = (instant.tm_sec * 6) % 360;
+	glRotatef(angle, 0.0, 0.0, -0.5);
+
+	glTranslatef(0.0, 4.5, 2.4);
 	glScalef(0.5, 5.0, 0.3);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
