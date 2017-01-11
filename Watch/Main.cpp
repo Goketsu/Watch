@@ -43,8 +43,8 @@ void myIdle(void)
 		instant = newInstant;
 		//float angle = (instant.tm_sec / 10) % 360;
 	}
-	printf("new test %d \n", newInstant.tm_sec);
-	printf("test %d \n",instant.tm_sec);
+	//printf("new test %d \n", newInstant.tm_sec);
+	//printf("test %d \n",instant.tm_sec);
 	glutPostRedisplay(); // reaffiche la scène
 }
 
@@ -117,7 +117,7 @@ void display2(void)
 }
 
 // dessin de l'aiguille des secondes
-void display3(void)
+void displaySecondes(void)
 {
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
@@ -129,7 +129,7 @@ void display3(void)
 	float angle = (instant.tm_sec * 6) % 360;
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 4.5, 2.4);
+	glTranslatef(0.0, 4.8, 2.4);
 	glScalef(0.5, 5.0, 0.3);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
@@ -138,7 +138,7 @@ void display3(void)
 }
 
 // dessin de l'aiguille des minutes
-void display3(void)
+void displayMinutes(void)
 {
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
@@ -147,11 +147,32 @@ void display3(void)
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
-	float angle = (instant.tm_sec * 6) % 360;
+	float angle = (instant.tm_min * 6) % 360;
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 4.5, 2.4);
-	glScalef(0.5, 5.0, 0.3);
+	glTranslatef(0.0, 4.0, 2.4);
+	glScalef(0.35, 4.0, 0.3);
+	glutSolidOctahedron();
+	//glutSolidSphere(1.25, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+}
+
+// dessin de l'aiguille des minutes
+void displayHeures(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
+
+	float angle = ((instant.tm_hour %12) * 30) % 360;
+	glRotatef(angle, 0.0, 0.0, -0.5);
+
+	glTranslatef(0.0, 3.0, 2.4);
+	glScalef(0.5, 3.0, 0.3);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
 	glPopMatrix();
@@ -165,7 +186,9 @@ void display(void)
 	glPushMatrix();
 	display1();
 	display2();
-	display3();
+	displaySecondes();
+	displayMinutes();
+	displayHeures();
 	glPopMatrix();
 	glFlush();
 	glutSwapBuffers();
