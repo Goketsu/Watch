@@ -137,6 +137,42 @@ void displaySecondes(void)
 	glPopMatrix();
 }
 
+void displayMarquages(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
+
+
+	glPushMatrix();
+	//float angle = (instant.tm_min * 6) % 360;
+	int i = 0;
+	for (i = 0; i < 12; i++)
+	{
+		glRotatef(30, 0.0, 0.0, 0.5);
+		glTranslatef(0.0, 9.0, 2.0);
+		glRotatef(35, 0.0, 0.0, 0.5);
+		glScalef(1.0, 1.0, 0.0);
+		glutSolidTetrahedron();
+	}
+	glPopMatrix();
+	/*
+	glPushMatrix();
+	glTranslatef(0.0, 9.0, 2.0);
+	glRotatef(35, 0.0, 0.0, 0.5);
+	glScalef(1.0, 1.0, 0.0);
+	glutSolidTetrahedron();
+	
+	glPopMatrix();
+	*/
+	//glutSolidOctahedron();
+	//glutSolidSphere(1.25, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+}
+
 // dessin de l'aiguille des minutes
 void displayMinutes(void)
 {
@@ -186,9 +222,12 @@ void display(void)
 	glPushMatrix();
 	display1();
 	display2();
+	/*
 	displaySecondes();
 	displayMinutes();
 	displayHeures();
+	*/
+	displayMarquages();
 	glPopMatrix();
 	glFlush();
 	glutSwapBuffers();
@@ -197,10 +236,6 @@ void display(void)
 
 int main(int argc, char** argv)
 {
-	printf("ca craint");
-	//glutIdleFunc(myIdle);
-	//printf("c'est le début");
-
 	/* Gestion de creation de fenetre*/
 	glutInit(&argc, argv);
 	// on travaille en rgba avec un double buffer et en profondeur
@@ -213,6 +248,7 @@ int main(int argc, char** argv)
 	setParametresOrthoBasique(-11.0, 11.0, -11.0, 11.0, -500.0, 500.0);
 	setManipulateurDistance(1.0f);
 
+	// permet de mettre à jour les aiguilles
 	glutIdleFunc(myIdle);
 
 	glutReshapeFunc(reshapeOrthoBasique);
