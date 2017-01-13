@@ -153,7 +153,7 @@ void displayMarquages(void)
 	{
 		glPushMatrix();
 		glRotatef(30*i, 0.0, 0.0, -0.5);
-		glTranslatef(0.0, 9.0, 2.0);
+		glTranslatef(0.0, 9.1, 2.0);
 		glRotatef(35, 0.0, 0.0, 0.5);
 		glScalef(1.0, 1.0, 0.0);
 		glutSolidTetrahedron();
@@ -161,16 +161,17 @@ void displayMarquages(void)
 	}
 
 	i = 0;
-	for (i = 1; i < 5; i++)
+	for (i = 1; i < 60; i++)
 	{
-	//	if (i != )
-		glPushMatrix();
-		glRotatef(6*i, 0.0, 0.0, 0.5);
-		glTranslatef(0.0, 9.3, 2.0);
-		glRotatef(35, 0.0, 0.0, 0.5);
-		glScalef(0.5, 0.5, 0.0);
-		glutSolidTetrahedron();
-		glPopMatrix();
+		if (i % 5 != 0){
+			glPushMatrix();
+			glRotatef(6 * i, 0.0, 0.0, 0.5);
+			glTranslatef(0.0, 9.4, 2.0);
+			glRotatef(35, 0.0, 0.0, 0.5);
+			glScalef(0.5, 0.5, 0.0);
+			glutSolidTetrahedron();
+			glPopMatrix();
+		}
 	}
 	
 	//glutSolidOctahedron();
@@ -228,11 +229,11 @@ void display(void)
 	glPushMatrix();
 	display1();
 	display2();
-	/*
+	
 	displaySecondes();
 	displayMinutes();
 	displayHeures();
-	*/
+	
 	displayMarquages();
 	glPopMatrix();
 	glFlush();
