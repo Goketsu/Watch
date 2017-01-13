@@ -142,34 +142,40 @@ void displayMarquages(void)
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
-	glPushMatrix();
+	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
 
-	glPushMatrix();
+	//glPushMatrix();
 	//float angle = (instant.tm_min * 6) % 360;
 	int i = 0;
 	for (i = 0; i < 12; i++)
 	{
-		glRotatef(30, 0.0, 0.0, 0.5);
+		glPushMatrix();
+		glRotatef(30*i, 0.0, 0.0, -0.5);
 		glTranslatef(0.0, 9.0, 2.0);
 		glRotatef(35, 0.0, 0.0, 0.5);
 		glScalef(1.0, 1.0, 0.0);
 		glutSolidTetrahedron();
+		glPopMatrix();
 	}
-	glPopMatrix();
-	/*
-	glPushMatrix();
-	glTranslatef(0.0, 9.0, 2.0);
-	glRotatef(35, 0.0, 0.0, 0.5);
-	glScalef(1.0, 1.0, 0.0);
-	glutSolidTetrahedron();
+
+	i = 0;
+	for (i = 1; i < 5; i++)
+	{
+	//	if (i != )
+		glPushMatrix();
+		glRotatef(6*i, 0.0, 0.0, 0.5);
+		glTranslatef(0.0, 9.3, 2.0);
+		glRotatef(35, 0.0, 0.0, 0.5);
+		glScalef(0.5, 0.5, 0.0);
+		glutSolidTetrahedron();
+		glPopMatrix();
+	}
 	
-	glPopMatrix();
-	*/
 	//glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
-	glPopMatrix();
+	
 	glPopMatrix();
 }
 
