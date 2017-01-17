@@ -77,7 +77,9 @@ void myInit(void)
 
 }
 
-/* Fonction qui ne fonctionne pas avec les autres ?MYSTERE? */
+/* Fonction qui ne fonctionne pas avec les autres ?MYSTERE? 
+Probablement du au glClear en début de fonction
+*/
 void displayCrochet(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,6 +142,26 @@ void displayCadran(void)
 	glPopMatrix();
 
 	glutSolidCylinder(10.0, 1.5, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void displayCouvercle(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	
+	glTranslatef(-10.0, 0.0, 10.5);
+	glRotatef(90, 0.0, -1.0, 0.0);
+	glutSolidCone(9.0, 0.8, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
 }
@@ -282,6 +304,7 @@ void display(void)
 	gluLookAt(0, 0, distanceCamera, 0, 0, 0, 0, 1, 0);
 	//glPushMatrix();
 	displayCadran();
+	displayCouvercle();
 	display2();
 	
 	displaySecondes();
