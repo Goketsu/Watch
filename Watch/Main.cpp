@@ -16,6 +16,7 @@
 #include "ModuleReshape.h"
 
 struct tm instant;
+int distanceCamera;
 
 //gestion du temps systeme
 void systemTime(void)
@@ -76,8 +77,30 @@ void myInit(void)
 
 }
 
+/* Fonction qui ne fonctionne pas avec les autres ?MYSTERE? */
+void displayCrochet(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
+
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, 5.0);
+	glRotatef(90, 1.0, 0.0, 0.0);
+	glutSolidCylinder(1.0, 1.5, 50, 50);
+	//glutSolidTorus(0.75, 10.0, 50, 50);
+	glPopMatrix();
+
+	
+	glPopMatrix();
+	glPopMatrix();
+}
+
 // dessin du disque de la montre
-void display1(void)
+void displayCadran(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
@@ -87,6 +110,30 @@ void display1(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
 	//glScalef(17.0, 5.0, 10.0);
 
+	/* Anneau pour la chaine */
+	glPushMatrix();
+	glTranslatef(0.0, 13.1, 0.75);
+	//glRotatef(90, 1.0, 0.0, 0.0);
+	glutSolidTorus(0.3, 1.2, 50, 50);
+	glPopMatrix();
+
+	/* Bouton pour modifier l'heure */
+	glPushMatrix();
+	glTranslatef(0.0, 13.0, 0.75);
+	glRotatef(90, 1.0, 0.0, 0.0);
+	glutSolidCylinder(1, 1.5, 50, 50);
+	//glutSolidTorus(0.75, 10.0, 50, 50);
+	glPopMatrix();
+
+	/* Attache au dessus de la montre */
+	glPushMatrix();
+	glTranslatef(0.0, 12.0, 0.75);
+	glRotatef(90, 1.0, 0.0, 0.0);
+	glutSolidCylinder(0.5, 3.0, 50, 50);
+	//glutSolidTorus(0.75, 10.0, 50, 50);
+	glPopMatrix();
+
+	/* Cadran principal */
 	glPushMatrix();
 	glTranslatef(0.0, 0.0, 0.75);
 	glutSolidTorus(0.75,10.0,50,50);
@@ -228,9 +275,13 @@ void displayHeures(void)
 void display(void)
 {
 	glEnable(GL_DEPTH_TEST);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
-	display1();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+	glLoadIdentity();
+	// gestion de la camera tournante
+	distanceCamera = 38;
+	gluLookAt(0, 0, distanceCamera, 0, 0, 0, 0, 1, 0);
+	//glPushMatrix();
+	displayCadran();
 	display2();
 	
 	displaySecondes();
@@ -238,9 +289,41 @@ void display(void)
 	displayHeures();
 	
 	displayMarquages();
+	/*
+	glPushMatrix();
+	displayCrochet();
 	glPopMatrix();
+	*/
+	//glPopMatrix();
 	glFlush();
 	glutSwapBuffers();
+
+}
+/*
+void myReshape(int w, int h)
+{
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+
+	glLoadIdentity();
+	glPushMatrix();
+	glTranslatef(0, 0, 25);
+	glOrtho(-50.0, 50.0, -50.0*h / w, 50.0*h / w, -100.0, 100.0);
+	// pour la camera je donne sa position, où elle regarde (point visé) et l'orientation de la tête (vecteur)
+	//gluLookAt(0, 0, 0, 0, 0, 0, 0, 1, 0);
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glLoadIdentity();
+}
+*/
+
+// fonction de recalcul de la taille de la fenetre
+void reshape(int x, int y)
+{
+	if (x > y)
+		glViewport(0, (y - x) / 2, x, x);
+	else
+		glViewport((x - y) / 2, 0, y, y);
 
 }
 
@@ -252,16 +335,25 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowPosition(300, 300);
 	glutInitWindowSize(400, 350);
-	glutCreateWindow("Test de transparence");
+	glutCreateWindow("Montre OpenGL");
 	myInit();
 	creationMenuBasique();
-	setParametresOrthoBasique(-11.0, 11.0, -11.0, 11.0, -500.0, 500.0);
-	setManipulateurDistance(1.0f);
+
+	// mise en place de la perspective
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0, 1.0, 0.1, 50.0); // angle, repport h/w, plan de clipping
+	glMatrixMode(GL_MODELVIEW);
+	
+	/* Ne fonctionnne pas pour le deplacement de la camera */
+	//setParametresOrthoBasique(-25.0, 25.0, -25.0, 25.0, -500.0, 500.0);
+	//setManipulateurDistance(0.1f);
+	
 
 	// permet de mettre à jour les aiguilles
 	glutIdleFunc(myIdle);
 
-	glutReshapeFunc(reshapeOrthoBasique);
+	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyBasique);
 	glutSpecialFunc(specialBasique);
 	glutMotionFunc(motionBasique);
