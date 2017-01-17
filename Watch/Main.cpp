@@ -127,6 +127,7 @@ void displaySecondes(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
 	float angle = (instant.tm_sec * 6) % 360;
+	//printf("salut %d", instant.tm_sec);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 4.8, 2.4);
@@ -191,6 +192,7 @@ void displayMinutes(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
 	float angle = (instant.tm_min * 6) % 360;
+	//printf("salut mintute %d", instant.tm_min);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 4.0, 2.4);
@@ -211,7 +213,8 @@ void displayHeures(void)
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
-	float angle = ((instant.tm_hour %12) * 30) % 360;
+	float angle = (((instant.tm_hour %12) * 30 + (instant.tm_min/2)) % 360);
+	//printf("%d",instant.tm_min/2);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 3.0, 2.4);
