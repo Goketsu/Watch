@@ -15,38 +15,90 @@
 #include "ModuleMenus.h"
 #include "ModuleReshape.h"
 
-struct tm instant;
-int distanceCamera;
+static struct tm instant;
+int heures, minutes, secondes;
+bool open = true, pause = false;
+bool rapide = false;
+int xCam = 0, yCam = 45, zCam = 0;
+float Sin[360], Cos[360]; // pas de 1 pour les calcul
+int distanceCamera = 38;
+#define PI 3.14159265
 
 //gestion du temps systeme
 void systemTime(void)
 {
-	time_t secondes;
+	time_t temps;
 	//struct tm instant;
 
-	time(&secondes);
-	localtime_s(&instant, &secondes);
+	time(&temps);
+	localtime_s(&instant, &temps);
+	heures = instant.tm_hour;
+	minutes = instant.tm_min;
+	secondes = instant.tm_sec;
 
 	printf("%d/%d ; %d:%d:%d\n", instant.tm_mday, instant.tm_mon + 1, instant.tm_hour, instant.tm_min, instant.tm_sec);
+	printf("%d:%d:%d\n", heures, minutes, secondes);
 }
 
 void myIdle(void)
 {
 	
-	time_t secondes;
+	time_t temps;
 	//struct tm instant;
 	struct tm newInstant;
-
-	time(&secondes); 
-	localtime_s(&newInstant, &secondes);
-	if (&newInstant.tm_sec != &instant.tm_sec)
+	
+	if (rapide == true){
+		secondes = secondes++ % 60;
+		if (secondes >= 60) secondes -= 60;
+		if (secondes == 0){
+			minutes = minutes++ % 60;
+			if (minutes >= 60) minutes -= 60;
+			printf("min ++");
+		}
+		if (minutes == 0 && secondes == 0){
+			heures = heures++ % 24;
+			if (heures >= 24) heures -= 24;
+		}
+	}
+	
+	//printf("%d:%d:%d\n", heures, minutes, secondes);
+	time(&temps); 
+	localtime_s(&newInstant, &temps);
+	if (newInstant.tm_sec != secondes)
 	{
-		instant = newInstant;
+		
+		//printf("new test %d \n", newInstant.tm_sec);
+		//instant = newInstant;
+		//secondes = instant.tm_sec;
+		if (rapide == false && pause == false){
+			
+			secondes = secondes++ % 60;
+			if (secondes >= 60) secondes -= 60;
+			if (secondes == 0){
+				minutes = minutes++ % 60;
+				if (minutes >= 60) minutes -= 60;
+				printf("min ++");
+			}
+			if (minutes == 0 && secondes == 0){
+				heures = heures++ % 24;
+				if (heures >= 24) heures -= 24;
+			}
+			/*
+			heures = instant.tm_hour;
+			minutes = instant.tm_min;
+			secondes = instant.tm_sec;
+			*/
+			
+		}
+		printf("test %d \n", secondes);
+		
 		//float angle = (instant.tm_sec / 10) % 360;
 	}
 	//printf("new test %d \n", newInstant.tm_sec);
 	//printf("test %d \n",instant.tm_sec);
-	glutPostRedisplay(); // reaffiche la scène
+	if (pause == false){
+		glutPostRedisplay(); // reaffiche la scène
+	}
 }
 
 // gestion des lumieres et melanges
@@ -195,8 +247,8 @@ void displaySecondes(void)
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
-	float angle = (instant.tm_sec * 6) % 360;
-	//printf("salut %d", instant.tm_sec);
+	float angle = (secondes * 6) % 360;
+	//printf("%d\n", secondes);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 4.8, 2.4);
@@ -260,7 +312,7 @@ void displayMinutes(void)
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
-	float angle = (instant.tm_min * 6) % 360;
+	float angle = (minutes * 6) % 360;
 	//printf("salut mintute %d", instant.tm_min);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
@@ -282,7 +334,7 @@ void displayHeures(void)
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
-	float angle = (((instant.tm_hour %12) * 30 + (instant.tm_min/2)) % 360);
+	float angle = (((heures %12) * 30 + (minutes/2)) % 360);
 	//printf("%d",instant.tm_min/2);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
@@ -300,8 +352,7 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glLoadIdentity();
 	// gestion de la camera tournante
-	distanceCamera = 38;
-	gluLookAt(0, 0, distanceCamera, 0, 0, 0, 0, 1, 0);
+	gluLookAt(0, 0, distanceCamera, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	//glPushMatrix();
 	displayCadran();
 	displayCouvercle();
@@ -340,6 +391,100 @@ void myReshape(int w, int h)
 }
 */
 
+//la gestion du clavier
+void clavier(unsigned char touche, int x, int y)
+{
+	
+	switch (touche)
+	{
+		/*
+		// faire tourner la camera
+		
+	case 'z':angle += 2;
+		if (angle >= 360) angle -= 360; glutPostRedisplay(); break;
+	case 'a':angle -= 2;
+		if (angle <= 0) angle += 360; glutPostRedisplay(); break;
+		// allumer et eteindre les lumieres
+	case 'w': glEnable(GL_LIGHT0); glutPostRedisplay(); break;
+	case 'x': glDisable(GL_LIGHT0); glutPostRedisplay(); break;
+	case 'c': glEnable(GL_LIGHT1); glutPostRedisplay(); break;
+	case 'v': glDisable(GL_LIGHT1); glutPostRedisplay(); break;
+		// gestion de la specularité
+	case 'm': Mspec[0] += 0.1; if (Mspec[0] > 1) Mspec[0] = 1;
+		Mspec[1] += 0.1; if (Mspec[1] > 1) Mspec[1] = 1;
+		Mspec[2] += 0.1; if (Mspec[2] > 1) Mspec[2] = 1;
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Mspec);
+		glutPostRedisplay(); break;
+	case 'l': Mspec[0] -= 0.1; if (Mspec[0] < 0) Mspec[0] = 0;
+		Mspec[1] -= 0.1; if (Mspec[1] < 0.9) Mspec[1] = 0.9;
+		Mspec[2] -= 0.1; if (Mspec[2] < 0) Mspec[2] = 0;
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Mspec);
+		glutPostRedisplay(); break;
+		// gestion de la brillance
+	case 'j': Mshiny -= 1; if (Mshiny < 0) Mshiny = 0;
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
+		glutPostRedisplay(); break;
+	case 'k': Mshiny += 1; if (Mshiny > 128) Mshiny = 128;
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
+		glutPostRedisplay(); break;
+		*/
+	case 'r': heures = instant.tm_hour;
+		minutes = instant.tm_min;
+		secondes = instant.tm_sec;
+		printf(" remise à l'heure \n");
+		break;
+	case 'a': if (rapide == false){
+				  rapide = true;
+				  printf(" vitesse rapide \n");
+				}
+			  else {
+				  rapide = false;
+				  printf(" vitesse normale \n");
+			  }
+			  break;
+	case 'p': if (pause == false){
+				  pause = true;
+				  printf(" pause \n");
+				}
+			  else { 
+				  pause = false;
+				  printf(" reprise \n");
+			  }
+			  break;
+		// fin de programme
+	case 'q': exit(0);
+	}
+}
+
+void speciale(int k, int x, int y)
+{
+	printf("test");
+	switch (k)
+	{
+		
+	case GLUT_KEY_UP: yCam = (yCam + 1) % distanceCamera/2;
+		if (yCam >= distanceCamera/2) yCam -= distanceCamera/2; glutPostRedisplay(); break;
+	case GLUT_KEY_DOWN: yCam = (yCam - 2) % 360; 
+		if (yCam <= 0) yCam += 360; glutPostRedisplay(); break;
+	case GLUT_KEY_LEFT: xCam = (xCam + 2) % 360; break;
+	case GLUT_KEY_RIGHT: xCam = (xCam - 2) % 360; break;
+	//case GLUT_KEY_CTRL_L: hand = (hand + 5) % 360; break;
+	//case GLUT_KEY_CTRL_R: hand = (hand - 5) % 360; break;
+	}
+	glutPostRedisplay();
+
+}
+
+void calcTabCosSin(void)
+{
+	int i;
+	for (i = 0; i < 360; i++)
+	{
+		Cos[i] = cos((float)i / 100.0*PI);
+		Sin[i] = sin((float)i / 100.0*PI);
+	}
+}
+
 // fonction de recalcul de la taille de la fenetre
 void reshape(int x, int y)
 {
@@ -365,7 +510,7 @@ int main(int argc, char** argv)
 	// mise en place de la perspective
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, 1.0, 0.1, 50.0); // angle, repport h/w, plan de clipping
+	gluPerspective(45.0, 1.0, 0.1, 500.0); // angle, repport h/w, plan de clipping
 	glMatrixMode(GL_MODELVIEW);
 	
 	/* Ne fonctionnne pas pour le deplacement de la camera */
@@ -377,7 +522,7 @@ int main(int argc, char** argv)
 	glutIdleFunc(myIdle);
 
 	glutReshapeFunc(reshape);
-	glutKeyboardFunc(keyBasique);
+	glutKeyboardFunc(clavier);
 	glutSpecialFunc(specialBasique);
 	glutMotionFunc(motionBasique);
 	glutMouseFunc(sourisBasique);
