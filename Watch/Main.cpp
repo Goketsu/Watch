@@ -20,8 +20,11 @@ int heures, minutes, secondes;
 bool open = true, pause = false;
 bool rapide = false;
 int xCam = 0, yCam = 45, zCam = 0;
-float Sin[360], Cos[360]; // pas de 1 pour les calcul
+//float Sin[360], Cos[360]; // pas de 1 pour les calcul
 int distanceCamera = 38;
+float coefTransparence = 1;
+int anglex, angley, x, y, xold, yold;
+char presse;
 #define PI 3.14159265
 
 //gestion du temps systeme
@@ -104,7 +107,7 @@ void myIdle(void)
 // gestion des lumieres et melanges
 void myInit(void)
 {
-	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+	GLfloat light_position[] = { 1.0, 1.0, 20.0, 0.0 };
 	glEnable(GL_LIGHTING);
 	// on defini les parametres de la source 0
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
@@ -122,10 +125,125 @@ void myInit(void)
 	// gestion des parametres de transparence
 	glEnable(GL_ALPHA_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// façon de gerer le modele d'eclairage
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+}
+
+// gear
+static void gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
+	GLint teeth, GLfloat tooth_depth)
+{
+	GLint i;
+	GLfloat r0, r1, r2;
+	GLfloat angle, da;
+	GLfloat u, v, len;
+
+	r0 = inner_radius;
+	r1 = outer_radius - tooth_depth / 2.0;
+	r2 = outer_radius + tooth_depth / 2.0;
+
+	da = 2.0 * PI / teeth / 4.0;
+
+	glShadeModel(GL_FLAT);
+
+	glNormal3f(0.0, 0.0, 1.0);
+
+	//draw front face
+	glBegin(GL_QUAD_STRIP);
+	for (i = 0; i <= teeth; i++) {
+		angle = i * 2.0 * PI / teeth;
+		glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+		glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
+		glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+		glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), width * 0.5);
+	}
+	glEnd();
+
+	//draw front sides of teeth
+	glBegin(GL_QUADS);
+	da = 2.0 * PI / teeth / 4.0;
+	for (i = 0; i < teeth; i++) {
+		angle = i * 2.0 * PI / teeth;
+
+		glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
+		glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), width * 0.5);
+		glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), width * 0.5);
+		glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), width * 0.5);
+	}
+	glEnd();
+
+	glNormal3f(0.0, 0.0, -1.0);
+
+	//draw back face
+	glBegin(GL_QUAD_STRIP);
+	for (i = 0; i <= teeth; i++) {
+		angle = i * 2.0 * PI / teeth;
+		glVertex3f(r1 * cos(angle), r1 * sin(angle), -width * 0.5);
+		glVertex3f(r0 * cos(angle), r0 * sin(angle), -width * 0.5);
+		glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), -width * 0.5);
+		glVertex3f(r0 * cos(angle), r0 * sin(angle), -width * 0.5);
+	}
+	glEnd();
+
+	//draw back sides of teeth
+	glBegin(GL_QUADS);
+	da = 2.0 * PI / teeth / 4.0;
+	for (i = 0; i < teeth; i++) {
+		angle = i * 2.0 * PI / teeth;
+
+		glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), -width * 0.5);
+		glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), -width * 0.5);
+		glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), -width * 0.5);
+		glVertex3f(r1 * cos(angle), r1 * sin(angle), -width * 0.5);
+	}
+	glEnd();
+
+	//draw outward faces of teeth
+	glBegin(GL_QUAD_STRIP);
+	for (i = 0; i < teeth; i++) {
+		angle = i * 2.0 * PI / teeth;
+
+		glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
+		glVertex3f(r1 * cos(angle), r1 * sin(angle), -width * 0.5);
+		u = r2 * cos(angle + da) - r1 * cos(angle);
+		v = r2 * sin(angle + da) - r1 * sin(angle);
+		len = sqrt(u * u + v * v);
+		u /= len;
+		v /= len;
+		glNormal3f(v, -u, 0.0);
+		glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), width * 0.5);
+		glVertex3f(r2 * cos(angle + da), r2 * sin(angle + da), -width * 0.5);
+		glNormal3f(cos(angle), sin(angle), 0.0);
+		glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), width * 0.5);
+		glVertex3f(r2 * cos(angle + 2 * da), r2 * sin(angle + 2 * da), -width * 0.5);
+		u = r1 * cos(angle + 3 * da) - r2 * cos(angle + 2 * da);
+		v = r1 * sin(angle + 3 * da) - r2 * sin(angle + 2 * da);
+		glNormal3f(v, -u, 0.0);
+		glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), width * 0.5);
+		glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da), -width * 0.5);
+		glNormal3f(cos(angle), sin(angle), 0.0);
+	}
+
+	glVertex3f(r1 * cos(0), r1 * sin(0), width * 0.5);
+	glVertex3f(r1 * cos(0), r1 * sin(0), -width * 0.5);
+
+	glEnd();
+
+	glShadeModel(GL_SMOOTH);
+
+	//draw inside radius cylinder
+	glBegin(GL_QUAD_STRIP);
+	for (i = 0; i <= teeth; i++) {
+		angle = i * 2.0 * PI / teeth;
+
+		glNormal3f(-cos(angle), -sin(angle), 0.0);
+		glVertex3f(r0 * cos(angle), r0 * sin(angle), -width * 0.5);
+		glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+	}
+	glEnd();
 
 }
 
@@ -156,12 +274,12 @@ void displayCrochet(void)
 // dessin du disque de la montre
 void displayCadran(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(coefTransparence));
 	//glScalef(17.0, 5.0, 10.0);
 
 	/* Anneau pour la chaine */
@@ -198,9 +316,78 @@ void displayCadran(void)
 	glPopMatrix();
 }
 
-void displayCouvercle(void)
+// dessin de l'engrenage
+void displayEngrenageSecondes(void)
 {
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurRouge(1.2f));
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	float angle = (secondes * 6) % 360;
+	glRotatef(angle-1, 0.0, 0.0, -0.5);
+
+	glTranslatef(0.0, 0.0, 0.9);
+	gear(0.7, 1.2, 0.3, 30.0, 0.1);
+	//glutSolidCone(10.0, 0.8, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+}
+
+// dessin de l'engrenage
+void displayEngrenageMinutes(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleu(1.2f));
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	float angle = (minutes * 6) % 360;
+	glRotatef(angle - 1, 0.0, 0.0, -0.5);
+
+	glTranslatef(0.0, 0.0, 0.6);
+	gear(0.6, 1.7, 0.3, 30.0, 0.1);
+	//glutSolidCone(10.0, 0.8, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+}
+
+// dessin de l'engrenage
+void displayEngrenageHeures(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurVert(1.2f));
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	float angle = (((heures % 12) * 30 + (minutes / 2)) % 360);
+	glRotatef(angle - 1, 0.0, 0.0, -0.5);
+
+	glTranslatef(0.0, 0.0, 0.3);
+	gear(0.5, 2.2, 0.3, 30.0, 0.1);
+	//glutSolidCone(10.0, 0.8, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void displayCouvercle(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
@@ -219,14 +406,14 @@ void displayCouvercle(void)
 }
 
 // dessin du verre
-void display2(void)
+void displayVerre(void)
 {
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(0.8f));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(0.25f));
 	glPushMatrix();
 	//glScalef(9.0, 9.0, 18.0);
 	glTranslatef(0.0, 0.0, 1.5);
@@ -245,14 +432,14 @@ void displaySecondes(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurRouge(2.0f));
 
 	float angle = (secondes * 6) % 360;
 	//printf("%d\n", secondes);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 4.8, 2.4);
-	glScalef(0.5, 5.0, 0.3);
+	glTranslatef(0.0, 4.5, 1.5);
+	glScalef(0.5, 4.5, 0.0);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
 	glPopMatrix();
@@ -275,7 +462,7 @@ void displayMarquages(void)
 	{
 		glPushMatrix();
 		glRotatef(30*i, 0.0, 0.0, -0.5);
-		glTranslatef(0.0, 9.1, 2.0);
+		glTranslatef(0.0, 9.1, 1.51);
 		glRotatef(35, 0.0, 0.0, 0.5);
 		glScalef(1.0, 1.0, 0.0);
 		glutSolidTetrahedron();
@@ -288,7 +475,7 @@ void displayMarquages(void)
 		if (i % 5 != 0){
 			glPushMatrix();
 			glRotatef(6 * i, 0.0, 0.0, 0.5);
-			glTranslatef(0.0, 9.4, 2.0);
+			glTranslatef(0.0, 9.4, 1.51);
 			glRotatef(35, 0.0, 0.0, 0.5);
 			glScalef(0.5, 0.5, 0.0);
 			glutSolidTetrahedron();
@@ -316,7 +503,7 @@ void displayMinutes(void)
 	//printf("salut mintute %d", instant.tm_min);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 4.0, 2.4);
+	glTranslatef(0.0, 4.0, 1.5);
 	glScalef(0.35, 4.0, 0.3);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
@@ -338,7 +525,7 @@ void displayHeures(void)
 	//printf("%d",instant.tm_min/2);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 3.0, 2.4);
+	glTranslatef(0.0, 3.0, 1.5);
 	glScalef(0.5, 3.0, 0.3);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
@@ -353,16 +540,21 @@ void display(void)
 	glLoadIdentity();
 	// gestion de la camera tournante
 	gluLookAt(0, 0, distanceCamera, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	glRotatef(angley, 1.0, 0.0, 0.0);
+	glRotatef(anglex, 0.0, 1.0, 0.0);
 	//glPushMatrix();
-	displayCadran();
 	displayCouvercle();
-	display2();
 	
 	displaySecondes();
 	displayMinutes();
 	displayHeures();
 	
 	displayMarquages();
+	displayEngrenageSecondes();
+	displayEngrenageMinutes();
+	displayEngrenageHeures();
+	displayCadran();
+	displayVerre();
 	/*
 	glPushMatrix();
 	displayCrochet();
@@ -428,6 +620,9 @@ void clavier(unsigned char touche, int x, int y)
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
 		glutPostRedisplay(); break;
 		*/
+	case 't': if (coefTransparence == 1.0) coefTransparence = 0.2; else coefTransparence = 1.0; break;
+	case 'z': distanceCamera--; break;
+	case 'Z': distanceCamera++; break;
 	case 'r': heures = instant.tm_hour;
 		minutes = instant.tm_min;
 		secondes = instant.tm_sec;
@@ -474,7 +669,7 @@ void speciale(int k, int x, int y)
 	glutPostRedisplay();
 
 }
-
+/*
 void calcTabCosSin(void)
 {
 	int i;
@@ -483,7 +678,7 @@ void calcTabCosSin(void)
 		Cos[i] = cos((float)i / 100.0*PI);
 		Sin[i] = sin((float)i / 100.0*PI);
 	}
-}
+}*/
 
 // fonction de recalcul de la taille de la fenetre
 void reshape(int x, int y)
@@ -493,6 +688,37 @@ void reshape(int x, int y)
 	else
 		glViewport((x - y) / 2, 0, y, y);
 
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	/* si on appuie sur le bouton gauche */
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		presse = 1; /* le booleen presse passe a 1 (vrai) */
+		xold = x; /* on sauvegarde la position de la souris */
+		yold = y;
+	}
+	/* si on relache le bouton gauche */
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+		presse = 0; /* le booleen presse passe a 0 (faux) */
+}
+void mousemotion(int x, int y)
+{
+	if (presse) /* si le bouton gauche est presse */
+	{
+		/* on modifie les angles de rotation de l'objet
+		en fonction de la position actuelle de la souris et de la derniere
+		position sauvegardee */
+		anglex = anglex + (x - xold);
+		angley = angley + (y - yold);
+		glutPostRedisplay(); /* on demande un rafraichissement de
+							 l'affichage */
+	}
+
+	xold = x; /* sauvegarde des valeurs courante de le position de la souris
+			  */
+	yold = y;
 }
 
 int main(int argc, char** argv)
@@ -525,7 +751,8 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(clavier);
 	glutSpecialFunc(specialBasique);
 	glutMotionFunc(motionBasique);
-	glutMouseFunc(sourisBasique);
+	glutMouseFunc(mouse);
+	glutMotionFunc(mousemotion);
 	glutDisplayFunc(display);
 	
 	//print du temps systeme
