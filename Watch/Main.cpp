@@ -670,6 +670,12 @@ void clavier(unsigned char touche, int x, int y)
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
 		glutPostRedisplay(); break;
 		*/
+	case 'l':
+		if (glIsEnabled(GL_LIGHT0))
+			glDisable(GL_LIGHT0);
+		else
+			glEnable(GL_LIGHT0); 
+		glutPostRedisplay(); break;
 	case 'm': minutes = minutes++ % 60; if (minutes >= 60) minutes -= 60;
 		majTemps();// glutPostRedisplay(); 
 		break;
@@ -773,7 +779,15 @@ void mouse(int button, int state, int x, int y)
 	/* si on relache le bouton gauche */
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
 		presse = 0; /* le booleen presse passe a 0 (faux) */
+	if (button == 3){
+		distanceCamera++;
+		printf("dezoom \n");
+	}if (button == 4){
+		distanceCamera--;
+		printf("dezoom \n");
+	}
 }
+
 void mousemotion(int x, int y)
 {
 	if (presse) /* si le bouton gauche est presse */
