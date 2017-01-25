@@ -19,6 +19,9 @@ static struct tm instant;
 int heures, minutes, secondes;
 bool open = true, pause = false;
 bool rapide = false;
+bool recule = false;
+bool reculeSec = false;
+bool tempsSynchro = true;
 int xCam = 0, yCam = 45, zCam = 0;
 //float Sin[360], Cos[360]; // pas de 1 pour les calcul
 int distanceCamera = 38;
@@ -41,6 +44,53 @@ void systemTime(void)
 
 	printf("%d/%d ; %d:%d:%d\n", instant.tm_mday, instant.tm_mon + 1, instant.tm_hour, instant.tm_min, instant.tm_sec);
 	printf("%d:%d:%d\n", heures, minutes, secondes);
+}
+
+void majTemps(void)
+{
+	//printf("%d:%d:%d\n", heures, minutes, secondes);
+	//secondes = secondes++ % 60;
+	printf("%d:%d:%d\n", heures, minutes, secondes);
+	if (secondes >= 60) secondes -= 60;
+	if (secondes <= -1) secondes += 60;
+	if (reculeSec){
+		if (secondes == 59){
+			minutes = minutes-- % 60;
+			if (minutes <= -1) minutes += 60;
+			printf("min --");
+		}
+	}
+	if (secondes == 0 && reculeSec == false){
+		minutes = minutes++ % 60;
+		if (minutes >= 60) minutes -= 60;
+		printf("min ++");
+	}
+	if (recule || reculeSec && secondes == 59){
+		if (minutes == 59){
+			printf("heure --");
+			heures = heures-- % 24;
+			if (heures <= -1) heures += 24;
+			recule = false;
+		}
+	}
+	
+	if (minutes == 0 && recule == false && reculeSec == false){
+		printf("heure ++");
+		heures = heures++ % 24;
+		if (heures >= 24) heures -= 24;
+	}
+	/*
+	if (minutes == 0){
+		printf("recule : %d", recule);
+		if (recule){
+			printf("heure --");
+			heures = heures-- % 24;
+		}else{
+			printf("heure ++");
+			heures = heures++ % 24;
+		}
+		if (heures >= 24) heures -= 24;
+	}*/
 }
 
 void myIdle(void)
@@ -67,11 +117,11 @@ void myIdle(void)
 	//printf("%d:%d:%d\n", heures, minutes, secondes);
 	time(&temps); 
 	localtime_s(&newInstant, &temps);
-	if (newInstant.tm_sec != secondes)
+	if (newInstant.tm_sec != instant.tm_sec && tempsSynchro == true)
 	{
 		
 		//printf("new test %d \n", newInstant.tm_sec);
-		//instant = newInstant;
+		instant = newInstant;
 		//secondes = instant.tm_sec;
 		if (rapide == false && pause == false){
 			
@@ -80,7 +130,7 @@ void myIdle(void)
 			if (secondes == 0){
 				minutes = minutes++ % 60;
 				if (minutes >= 60) minutes -= 60;
-				printf("min ++");
+				printf("Idlemin ++");
 			}
 			if (minutes == 0 && secondes == 0){
 				heures = heures++ % 24;
@@ -620,12 +670,33 @@ void clavier(unsigned char touche, int x, int y)
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
 		glutPostRedisplay(); break;
 		*/
+	case 'm': minutes = minutes++ % 60; if (minutes >= 60) minutes -= 60;
+		majTemps();// glutPostRedisplay(); 
+		break;
+	case 'M': minutes = minutes-- % 60; if (minutes <= -1){ minutes += 60; }
+		recule = true;
+		majTemps();// glutPostRedisplay(); 
+		recule = false;
+		break;
+
+	case 's': secondes = secondes++ % 60;if (secondes >= 60) secondes -= 60;
+		/*tempsSynchro = false;*/ majTemps(); break;
+	case 'S': secondes = secondes-- % 60; if (secondes <= -1) secondes += 60;
+		reculeSec = true;
+		majTemps();
+		reculeSec = false; 
+		break;
+
+	case 'h': heures = heures++ % 24; majTemps(); if (heures >= 24) heures -= 24; break;
+	case 'H': heures = heures-- % 24; majTemps(); if (heures >= 24) heures -= 24; break;
+
 	case 't': if (coefTransparence == 1.0) coefTransparence = 0.2; else coefTransparence = 1.0; break;
 	case 'z': distanceCamera--; break;
 	case 'Z': distanceCamera++; break;
 	case 'r': heures = instant.tm_hour;
 		minutes = instant.tm_min;
 		secondes = instant.tm_sec;
+		tempsSynchro = true;
 		printf(" remise à l'heure \n");
 		break;
 	case 'a': if (rapide == false){
