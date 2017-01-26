@@ -302,7 +302,7 @@ Probablement du au glClear en début de fonction
 */
 void displayCrochet(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
@@ -318,6 +318,62 @@ void displayCrochet(void)
 
 	
 	glPopMatrix();
+	glPopMatrix();
+}
+
+// tentative de texte pour les chiffres
+void displayChiffre(void)
+{
+	unsigned char douze[3] = { 'X', 'I', 'I' };
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glTranslatef(-0.7, 7.0, 1.5);
+	glRasterPos2f(0.0, 0.0);
+	glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, 'X');
+	//glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, douze);
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void displayChiffre2(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(-0.8, 7.0, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(45, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glRotatef(45, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	//glutSolidCube(1.0);
+	//glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, 'X');
+	//glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, douze);
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(0.2, 7.0, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.85, 7.0, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
 	glPopMatrix();
 }
 
@@ -437,7 +493,7 @@ void displayEngrenageHeures(void)
 
 void displayCouvercle(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
@@ -488,7 +544,7 @@ void displaySecondes(void)
 	//printf("%d\n", secondes);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 4.5, 1.5);
+	glTranslatef(0.0, 4.5, 1.51);
 	glScalef(0.5, 4.5, 0.0);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
@@ -553,7 +609,7 @@ void displayMinutes(void)
 	//printf("salut mintute %d", instant.tm_min);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 4.0, 1.5);
+	glTranslatef(0.0, 4.0, 1.51);
 	glScalef(0.35, 4.0, 0.3);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
@@ -575,7 +631,7 @@ void displayHeures(void)
 	//printf("%d",instant.tm_min/2);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 3.0, 1.5);
+	glTranslatef(0.0, 3.0, 1.51);
 	glScalef(0.5, 3.0, 0.3);
 	glutSolidOctahedron();
 	//glutSolidSphere(1.25, 50, 50);
@@ -593,8 +649,12 @@ void display(void)
 	glRotatef(angley, 1.0, 0.0, 0.0);
 	glRotatef(anglex, 0.0, 1.0, 0.0);
 	//glPushMatrix();
+	//glClearColor(0, 0, 0, 0);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//glColor3d(0, 0, 0); // Texte en blanc
+	displayChiffre2();
+
 	displayCouvercle();
-	
 	displaySecondes();
 	displayMinutes();
 	displayHeures();
