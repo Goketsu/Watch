@@ -30,8 +30,14 @@ int anglex, angley, x, y, xold, yold;
 char presse;
 #define PI 3.14159265
 
-float rotateCouvX = 0.0, rotateCouvY = -1.0, rotateCouvZ = 0.0, translateCouvX = -10.0, translateCouvY = 0.0, translateCouvZ = 11.5;
-float angleCouv = 90;
+float rotateCouvX;
+float rotateCouvY;
+float rotateCouvZ;
+float translateCouvX[10];
+float translateCouvY;
+float translateCouvZ[10];
+float angleCouv[10];
+int animationCouv = 0;
 
 //gestion du temps systeme
 void systemTime(void)
@@ -102,6 +108,22 @@ void myIdle(void)
 	time_t temps;
 	//struct tm instant;
 	struct tm newInstant;
+	if (open == false){
+		if (animationCouv < 9){
+			animationCouv++;
+			printf(" animation : %d", animationCouv);
+			printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
+			printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
+		}
+	}
+	if (open == true){
+		if (animationCouv > 0){
+			animationCouv--;
+			printf(" animation : %d", animationCouv);
+			printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
+			printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
+		}
+	}
 	
 	if (rapide == true){
 		secondes = secondes++ % 60;
@@ -505,8 +527,11 @@ void displayCouvercle(void)
 	glPushMatrix();
 	//glScalef(9.0, 9.0, 18.0);
 
-	glTranslatef(translateCouvX, translateCouvY, translateCouvZ);
-	glRotatef(angleCouv, rotateCouvX, rotateCouvY, rotateCouvZ);
+	glTranslatef(translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
+	glRotatef(angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
+	//printf("animation : %d", animationCouv);
+	//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX[animationCouv], rotateCouvY[animationCouv], rotateCouvZ[animationCouv]);
+	//printf("rotation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY[animationCouv], translateCouvZ[animationCouv]);
 	//glTranslatef(-10.0, 0.0, 10.5);
 	//glRotatef(90, 0.0, -1.0, 0.0);
 	glutSolidCone(10.0, 0.8, 50, 50);
@@ -518,46 +543,57 @@ void displayCouvercle(void)
 
 void animationCouvercle(void)
 {
-	angleCouv = 80.0;
-	translateCouvX = -8.;
-	translateCouvZ = 11.4;
-	glutPostRedisplay();
+	angleCouv[1] = 80.0;
+	//translateCouvX[1] = -10.0;
+	//translateCouvZ[1] = 11.4;
+	translateCouvX[1] = -8.;
+	translateCouvZ[1] = 11.4;
+	//glutPostRedisplay();
 	//Sleep(500);
-	/*angleCouv = 70.0;
-	translateCouvX = -6.8;
-	translateCouvZ = 10.9;
-	glutPostRedisplay();
+	angleCouv[2] = 70.0;
+	translateCouvX[2] = -6.8;
+	translateCouvZ[2] = 10.9;
+	//glutPostRedisplay();
 	//Sleep(500);
-	/*angleCouv = 60.0;
-	translateCouvX = -5.3;
-	translateCouvZ = 9.8;
-	glutPostRedisplay();
+	angleCouv[3] = 60.0;
+	translateCouvX[3] = -5.3;
+	translateCouvZ[3] = 9.8;
+	//glutPostRedisplay();
 	//Sleep(500);
-	/*angleCouv = 50.0;
-	translateCouvX = -4.;
-	translateCouvZ = 8.8;
-	glutPostRedisplay();
+	angleCouv[4] = 50.0;
+	translateCouvX[4] = -4.;
+	translateCouvZ[4] = 8.8;
+	//glutPostRedisplay();
 	//Sleep(500);
-	/*angleCouv = 40.0;
-	translateCouvX = -2.9;
-	translateCouvZ = 7.6;
-	glutPostRedisplay();
+	angleCouv[5] = 40.0;
+	translateCouvX[5] = -2.9;
+	translateCouvZ[5] = 7.6;
+	//glutPostRedisplay();
 	//Sleep(500);
-	/*angleCouv = 30.0;
-	translateCouvX = -1.9;
-	translateCouvZ = 6.3;
-	glutPostRedisplay();
+	angleCouv[6] = 30.0;
+	translateCouvX[6] = -1.9;
+	translateCouvZ[6] = 6.3;
+	//glutPostRedisplay();
 	//Sleep(500);
-	/*angleCouv = 20.0;
-	translateCouvX = -1.2;
-	translateCouvZ = 4.7;
-	glutPostRedisplay();
+	angleCouv[7] = 20.0;
+	translateCouvX[7] = -1.2;
+	translateCouvZ[7] = 4.7;
+	//glutPostRedisplay();
 	//Sleep(500);
-	/*angleCouv = 10.0;
-	translateCouvX = -0.5;
-	translateCouvZ = 3.2;
-	glutPostRedisplay();
-	*/
+	angleCouv[8] = 10.0;
+	translateCouvX[8] = -0.5;
+	translateCouvZ[8] = 3.2;
+	//glutPostRedisplay();
+	//Sleep(500);
+	angleCouv[9] = 0.0;
+	translateCouvX[9] = 0.0;
+	translateCouvZ[9] = 1.6;
+	//glutPostRedisplay();
+	
+
+	rotateCouvX = 0.0;	rotateCouvY = -1.0;	rotateCouvZ = 0.0;	
+	translateCouvX[0] = -10.0;	translateCouvY = 0.0;	translateCouvZ[0] = 11.5;
+	angleCouv[0] = 90.0;
 }
 
 // dessin du verre
@@ -779,7 +815,8 @@ void clavier(unsigned char touche, int x, int y)
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
 		glutPostRedisplay(); break;
 		*/
-	case 'o': animationCouvercle(); break;
+	case 'o': if (open) open = false; else open = true; break;
+		//animationCouv++; break;
 	case 'l':
 		if (glIsEnabled(GL_LIGHT0))
 			glDisable(GL_LIGHT0);
@@ -933,6 +970,7 @@ int main(int argc, char** argv)
 	glLoadIdentity();
 	gluPerspective(45.0, 1.0, 0.1, 500.0); // angle, repport h/w, plan de clipping
 	glMatrixMode(GL_MODELVIEW);
+	animationCouvercle();
 	
 	/* Ne fonctionnne pas pour le deplacement de la camera */
 	//setParametresOrthoBasique(-25.0, 25.0, -25.0, 25.0, -500.0, 500.0);
