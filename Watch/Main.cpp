@@ -30,6 +30,9 @@ int anglex, angley, x, y, xold, yold;
 char presse;
 #define PI 3.14159265
 
+float rotateCouvX = 0.0, rotateCouvY = -1.0, rotateCouvZ = 0.0, translateCouvX = -10.0, translateCouvY = 0.0, translateCouvZ = 11.5;
+float angleCouv = 90;
+
 //gestion du temps systeme
 void systemTime(void)
 {
@@ -501,14 +504,60 @@ void displayCouvercle(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
 	glPushMatrix();
 	//glScalef(9.0, 9.0, 18.0);
-	
-	glTranslatef(-10.0, 0.0, 10.5);
-	glRotatef(90, 0.0, -1.0, 0.0);
-	glutSolidCone(9.0, 0.8, 50, 50);
+
+	glTranslatef(translateCouvX, translateCouvY, translateCouvZ);
+	glRotatef(angleCouv, rotateCouvX, rotateCouvY, rotateCouvZ);
+	//glTranslatef(-10.0, 0.0, 10.5);
+	//glRotatef(90, 0.0, -1.0, 0.0);
+	glutSolidCone(10.0, 0.8, 50, 50);
 	//glutSolidCube(1.0);
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
+}
+
+void animationCouvercle(void)
+{
+	angleCouv = 80.0;
+	translateCouvX = -8.;
+	translateCouvZ = 11.4;
+	glutPostRedisplay();
+	//Sleep(500);
+	/*angleCouv = 70.0;
+	translateCouvX = -6.8;
+	translateCouvZ = 10.9;
+	glutPostRedisplay();
+	//Sleep(500);
+	/*angleCouv = 60.0;
+	translateCouvX = -5.3;
+	translateCouvZ = 9.8;
+	glutPostRedisplay();
+	//Sleep(500);
+	/*angleCouv = 50.0;
+	translateCouvX = -4.;
+	translateCouvZ = 8.8;
+	glutPostRedisplay();
+	//Sleep(500);
+	/*angleCouv = 40.0;
+	translateCouvX = -2.9;
+	translateCouvZ = 7.6;
+	glutPostRedisplay();
+	//Sleep(500);
+	/*angleCouv = 30.0;
+	translateCouvX = -1.9;
+	translateCouvZ = 6.3;
+	glutPostRedisplay();
+	//Sleep(500);
+	/*angleCouv = 20.0;
+	translateCouvX = -1.2;
+	translateCouvZ = 4.7;
+	glutPostRedisplay();
+	//Sleep(500);
+	/*angleCouv = 10.0;
+	translateCouvX = -0.5;
+	translateCouvZ = 3.2;
+	glutPostRedisplay();
+	*/
 }
 
 // dessin du verre
@@ -730,6 +779,7 @@ void clavier(unsigned char touche, int x, int y)
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
 		glutPostRedisplay(); break;
 		*/
+	case 'o': animationCouvercle(); break;
 	case 'l':
 		if (glIsEnabled(GL_LIGHT0))
 			glDisable(GL_LIGHT0);
