@@ -109,19 +109,19 @@ void myIdle(void)
 	//struct tm instant;
 	struct tm newInstant;
 	if (open == false){
-		if (animationCouv < 9){
+		if (animationCouv < 45){
 			animationCouv++;
-			printf(" animation : %d", animationCouv);
-			printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
-			printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
+			printf(" animation : %d", animationCouv/5);
+			//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
+			//printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
 		}
 	}
 	if (open == true){
 		if (animationCouv > 0){
 			animationCouv--;
 			printf(" animation : %d", animationCouv);
-			printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
-			printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
+			//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
+			//printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
 		}
 	}
 	
@@ -527,8 +527,8 @@ void displayCouvercle(void)
 	glPushMatrix();
 	//glScalef(9.0, 9.0, 18.0);
 
-	glTranslatef(translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
-	glRotatef(angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
+	glTranslatef(translateCouvX[animationCouv/5], translateCouvY, translateCouvZ[animationCouv/5]);
+	glRotatef(angleCouv[animationCouv/5], rotateCouvX, rotateCouvY, rotateCouvZ);
 	//printf("animation : %d", animationCouv);
 	//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX[animationCouv], rotateCouvY[animationCouv], rotateCouvZ[animationCouv]);
 	//printf("rotation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY[animationCouv], translateCouvZ[animationCouv]);
