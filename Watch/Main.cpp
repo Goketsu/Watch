@@ -16,36 +16,50 @@
 #include "ModuleReshape.h"
 #include "loadppm.h"
 
+// fichiers pour les differentes textures
 char texFileName[] = "hexagonalTrianglesRotate.ppm";
 char texFileName2[] = "hexagonalTrianglesRotate2.ppm";
 char texFileName3[] = "hexagonalTrianglesRotate3.ppm";
 PPMImage *image;
 
+// numero de la texture actuelle
 int numeroTex = 1;
 
-GLfloat minX = 0.0, maxX = 1.0;
+// booleen pour savoir si on affiche ou non la texture
 bool texture = false;
 
+// numero de la couleur choisi pour la montre
 static int couleur = 11;
-GLfloat rouge[] = { 1.0, 0.0, 0.0, 0.5 };
-GLfloat vert[] = { 0.0, 1.0, 0.0, 0.5 };
-GLfloat bleu[] = { 0.0, 0.0, 1.0, 0.5 };
 
+// gestion du temps systeme
 static struct tm instant;
 int heures, minutes, secondes;
-bool open = true, pause = false;
+
+// booleen pour savoir si le couvercle est ouvert ou non
+bool open = true;
+// boolean pour savoir si on a mis en pause
+bool pause = false;
+// booleen pour savoir si on accelere
 bool rapide = false;
+// booleen pour savoir si on recule l'aiguille des minutes
 bool recule = false;
+// booleen pour savoir si on recule l'aiguille des secondes
 bool reculeSec = false;
+// booleen pour savoir si on est synchroniser avec le temps systeme
 bool tempsSynchro = true;
+// position de la camera
 int xCam = 0, yCam = 45, zCam = 0;
-//float Sin[360], Cos[360]; // pas de 1 pour les calcul
+// distance de la camera
 int distanceCamera = 38;
+// coefficient de transparence (0 = invisible, 1 = visible)
 float coefTransparence = 1;
+// gestion de la position de la camera
 int anglex, angley, x, y, xold, yold;
+// booleen pour savoir si le bouton gauche de la souris en enfoncé
 char presse;
 #define PI 3.14159265
 
+// gestion de la position du couvercle pour permettre son animation
 float rotateCouvX;
 float rotateCouvY;
 float rotateCouvZ;
@@ -67,10 +81,11 @@ void systemTime(void)
 	minutes = instant.tm_min;
 	secondes = instant.tm_sec;
 
-	printf("%d/%d ; %d:%d:%d\n", instant.tm_mday, instant.tm_mon + 1, instant.tm_hour, instant.tm_min, instant.tm_sec);
+	//printf("%d/%d ; %d:%d:%d\n", instant.tm_mday, instant.tm_mon + 1, instant.tm_hour, instant.tm_min, instant.tm_sec);
 	printf("%d:%d:%d\n", heures, minutes, secondes);
 }
 
+// permet de modifier l'heure interne en avancant/reculant les aiguilles
 void majTemps(void)
 {
 	//printf("%d:%d:%d\n", heures, minutes, secondes);
@@ -82,17 +97,17 @@ void majTemps(void)
 		if (secondes == 59){
 			minutes = minutes-- % 60;
 			if (minutes <= -1) minutes += 60;
-			printf("min --");
+			//printf("min --");
 		}
 	}
 	if (secondes == 0 && reculeSec == false){
 		minutes = minutes++ % 60;
 		if (minutes >= 60) minutes -= 60;
-		printf("min ++");
+		//printf("min ++");
 	}
 	if (recule || reculeSec && secondes == 59){
 		if (minutes == 59){
-			printf("heure --");
+			//printf("heure --");
 			heures = heures-- % 24;
 			if (heures <= -1) heures += 24;
 			recule = false;
@@ -100,54 +115,39 @@ void majTemps(void)
 	}
 	
 	if (minutes == 0 && recule == false && reculeSec == false){
-		printf("heure ++");
+		//printf("heure ++");
 		heures = heures++ % 24;
 		if (heures >= 24) heures -= 24;
 	}
-	/*
-	if (minutes == 0){
-		printf("recule : %d", recule);
-		if (recule){
-			printf("heure --");
-			heures = heures-- % 24;
-		}else{
-			printf("heure ++");
-			heures = heures++ % 24;
-		}
-		if (heures >= 24) heures -= 24;
-	}*/
 }
 
+// fonction qui est appelé en permanence quand il n'y a aucune autre action
 void myIdle(void)
 {
 	
 	time_t temps;
-	//struct tm instant;
 	struct tm newInstant;
+
+	// animation du couvercle
 	if (open == false){
-		if (animationCouv < 45){
+		if (animationCouv < 18){
 			animationCouv++;
-			//printf(" animation : %d", animationCouv/5);
-			//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
-			//printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
 		}
 	}
 	if (open == true){
 		if (animationCouv > 0){
 			animationCouv--;
-			//printf(" animation : %d", animationCouv);
-			//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
-			//printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
 		}
 	}
 	
+	// gestion de l'acceleration
 	if (rapide == true){
 		secondes = secondes++ % 60;
 		if (secondes >= 60) secondes -= 60;
 		if (secondes == 0){
 			minutes = minutes++ % 60;
 			if (minutes >= 60) minutes -= 60;
-			printf("min ++");
+			//printf("min ++");
 		}
 		if (minutes == 0 && secondes == 0){
 			heures = heures++ % 24;
@@ -155,15 +155,13 @@ void myIdle(void)
 		}
 	}
 	
-	//printf("%d:%d:%d\n", heures, minutes, secondes);
+	// gestion de l'animation normale de la montre
 	time(&temps); 
 	localtime_s(&newInstant, &temps);
 	if (newInstant.tm_sec != instant.tm_sec && tempsSynchro == true)
 	{
 		
-		//printf("new test %d \n", newInstant.tm_sec);
 		instant = newInstant;
-		//secondes = instant.tm_sec;
 		if (rapide == false && pause == false){
 			
 			secondes = secondes++ % 60;
@@ -171,36 +169,27 @@ void myIdle(void)
 			if (secondes == 0){
 				minutes = minutes++ % 60;
 				if (minutes >= 60) minutes -= 60;
-				printf("Idlemin ++");
+				//printf("Idlemin ++");
 			}
 			if (minutes == 0 && secondes == 0){
 				heures = heures++ % 24;
 				if (heures >= 24) heures -= 24;
 			}
-			/*
-			heures = instant.tm_hour;
-			minutes = instant.tm_min;
-			secondes = instant.tm_sec;
-			*/
 			
 		}
-		//printf("test %d \n", secondes);
-		
-		//float angle = (instant.tm_sec / 10) % 360;
 	}
-	//printf("new test %d \n", newInstant.tm_sec);
-	//printf("test %d \n",instant.tm_sec);
+	
+	// on reaffiche si on est pas en pause
 	if (pause == false){
 		glutPostRedisplay(); // reaffiche la scène
 	}
 }
 
-// gestion des lumieres et melanges
+// gestion des lumieres et textures
 void myInit(void)
 {
 	image = new PPMImage(texFileName);
 	
-	//glClearColor(0.0, 0.0, 0.0, 0.0);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	
@@ -219,6 +208,7 @@ void myInit(void)
 	glEnable(GL_TEXTURE_2D);
 	glShadeModel(GL_FLAT);
 	
+	// on defini la position des lumieres
 	GLfloat light_position[] = { 1.0, 1.0, 20.0, 0.0 };
 	glEnable(GL_LIGHTING);
 	// on defini les parametres de la source 0
@@ -254,11 +244,9 @@ void myInit(void)
 	// façon de gerer le modele d'eclairage
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
-	
-
 }
 
-// gear
+// fonction pour creer un engrenage
 static void gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 	GLint teeth, GLfloat tooth_depth)
 {
@@ -373,8 +361,12 @@ static void gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 
 }
 
+// affichage de la texture au dos de la montre en fonction de celle choisi
 void displayTexture(void)
 {
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
 	if (numeroTex == 1)
 		image = new PPMImage(texFileName);
 	else if (numeroTex == 2)
@@ -388,224 +380,166 @@ void displayTexture(void)
 	delete image;
 	
 	glEnable(GL_TEXTURE_2D);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	/*glBegin(GL_QUADS);
-	glTexCoord2f(minX, 0.0); glVertex3f(-10.0, -10.0, -0.01);
-	glTexCoord2f(minX, 1.0); glVertex3f(-10.0, 10.0,- 0.01);
-	glTexCoord2f(maxX, 1.0); glVertex3f(10.0, 10.0, -0.01);
-	glTexCoord2f(maxX, 0.0); glVertex3f(10.0, -10.0, -0.01);
-	
-	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 0.5); glVertex3f(-10.0, 0.0, -0.01);
-	glTexCoord2f(0.15, 0.15); glVertex3f(-7.4, -7.4, -0.01);
-	glTexCoord2f(0.5, 0.0); glVertex3f(0.0, -10.0, -0.01);
-	glTexCoord2f(0.85, 0.15); glVertex3f(7.4, -7.4, -0.01);
-	glTexCoord2f(1.0, 0.5); glVertex3f(10.0, 0.0, -0.01);
-	glTexCoord2f(0.85, 0.85); glVertex3f(7.4, 7.4, -0.01);
-	glTexCoord2f(0.5, 1.0); glVertex3f(0.0, 10.0, -0.01);
-	glTexCoord2f(0.15, 0.85); glVertex3f(-7.4, 7.4, -0.01);
-	*/
+
 	glBegin(GL_POLYGON);
 	glTexCoord2f(0.05, 0.75); glVertex3f(-8.0, 4.4, -0.01);
 	glTexCoord2f(0.05, 0.25); glVertex3f(-8.0, -5.4, -0.01);
 	glTexCoord2f(0.5, 0.0); glVertex3f(0.0, -10.0, -0.01);
 	glTexCoord2f(0.95, 0.25); glVertex3f(8, -5.4, -0.01);
-	//glTexCoord2f(1.0, 0.5); glVertex3f(10.0, 0.0, -0.01);
 	glTexCoord2f(0.95, 0.75); glVertex3f(8, 4.6, -0.01);
 	glTexCoord2f(0.5, 1.0); glVertex3f(0.0, 10.0, -0.01);
-	//glTexCoord2f(0.15, 0.85); glVertex3f(-7.4, 7.4, -0.01);
 	glEnd();
-	//glutSwapBuffers();
-	//texture = true;
+
+	glPopMatrix();
+
 	glDisable(GL_TEXTURE_2D);
 }
 
-/* Fonction qui ne fonctionne pas avec les autres ?MYSTERE? 
-Probablement du au glClear en début de fonction
-*/
-void displayCrochet(void)
-{
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
-	manipulateurSouris();
-	manipulateurClavier();
-	glPushMatrix();
-	//if (couleur = 11)
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
-	/*if (couleur = 12)
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCiel(1.0f));
-	if (couleur = 13)
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCielFonce(1.0f));
-*/
-	glPushMatrix();
-	glTranslatef(0.0, 0.0, 5.0);
-	glRotatef(90, 1.0, 0.0, 0.0);
-	glutSolidCylinder(1.0, 1.5, 50, 50);
-	//glutSolidTorus(0.75, 10.0, 50, 50);
-	glPopMatrix();
-
-	
-	glPopMatrix();
-	glPopMatrix();
-}
-
-// tentative de texte pour les chiffres
-void displayChiffre(void)
-{
-	unsigned char douze[3] = { 'X', 'I', 'I' };
-	glPushMatrix();
-	manipulateurSouris();
-	manipulateurClavier();
-	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
-	glTranslatef(-0.7, 7.0, 1.5);
-	glRasterPos2f(0.0, 0.0);
-	glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, 'X');
-	//glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, douze);
-	glPopMatrix();
-	glPopMatrix();
-}
-
+// affichage du chiffre romain XII
 void displayChiffre12(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(-0.8, 7.8, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
-	glutSolidCube(1.0);
-	
+	glutSolidCube(1.0);	
 	glPopMatrix();
+
 	glPushMatrix();
-	glTranslatef(0.2, 7.8, 1.5);
+	glTranslatef(1.5, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.85, 7.8, 1.5);
+	glTranslatef(0.95, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPopMatrix();
 	glPopMatrix();
 }
 
+// affichage du chiffre romain XI
 void displayChiffre11(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(-3.9, 6.6, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
-	
 	glPopMatrix();
+
 	glPushMatrix();
-	glTranslatef(-2.85, 6.6, 1.5);
+	glTranslatef(1.05, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
-	
+
+	glPopMatrix();
 	glPopMatrix();
 }
 
+// affichage du chiffre romain X
 void displayChiffre10(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(-6.5, 3.5, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
-	
+	glPopMatrix();
+
+	glPopMatrix();
 	glPopMatrix();
 }
 
+// affichage du chiffre romain IX
 void displayChiffre9(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(-7.1, 0.0, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glRotatef(45, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
-
 	glPopMatrix();
+
 	glPushMatrix();
-	glTranslatef(-8.1, 0.0, 1.5);
+	glTranslatef(1.05, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
 	glPopMatrix();
+	glPopMatrix();
 }
 
+// affichage du chiffre romain VIII
 void displayChiffre8(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(-6.7, -3.7, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(30, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glTranslatef(-0.6, 0.0, 0.0);
 	glRotatef(30, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
@@ -613,44 +547,44 @@ void displayChiffre8(void)
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-5.7, -3.7, 1.5);
+	glTranslatef(0.9, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-5.1, -3.7, 1.5);
+	glTranslatef(1.5, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-4.5, -3.7, 1.5);
+	glTranslatef(2.1, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
-
+	glPopMatrix();
 	glPopMatrix();
 }
 
+// affichage du chiffre romain VII
 void displayChiffre7(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(-3.9, -6.6, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(30, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glTranslatef(-0.6, 0.0, 0.0);
 	glRotatef(30, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
@@ -658,38 +592,38 @@ void displayChiffre7(void)
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-2.9, -6.6, 1.5);
+	glTranslatef(0.9, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix(); 
 	
 	glPushMatrix();
-	glTranslatef(-2.3, -6.6, 1.5);
+	glTranslatef(1.5, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
-
+	glPopMatrix();
 	glPopMatrix();
 }
 
+// affichage du chiffre romain VI
 void displayChiffre6(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(-0.5, -7.8, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(30, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glTranslatef(-0.6, 0.0, 0.0);
 	glRotatef(30, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
@@ -697,24 +631,24 @@ void displayChiffre6(void)
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.5, -7.8, 1.5);
+	glTranslatef(0.9, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
 	glPopMatrix();
+	glPopMatrix();
 }
 
+// affichage du chiffre romain V
 void displayChiffre5(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(3.9, -6.6, 1.5);
-	//glRasterPos2f(0.0, 0.0);
 	glPushMatrix();
 
 	glRotatef(30, 0.0, 0.0, -1.0);
@@ -731,23 +665,23 @@ void displayChiffre5(void)
 	glPopMatrix();
 }
 
+// affichage du chiffre romain IV
 void displayChiffre4(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
 	glTranslatef(6.7, -3.7, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
+	glPushMatrix();
 	glRotatef(30, 0.0, 0.0, -1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
+	glPushMatrix();
 	glTranslatef(-0.6, 0.0, 0.0);
 	glRotatef(30, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
@@ -755,41 +689,36 @@ void displayChiffre4(void)
 	glPopMatrix();
 	
 	glPushMatrix();
-	glTranslatef(5.2, -3.7, 1.5);
+	glTranslatef(-1.5, 0.0, 0.0);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
-	
+
+	glPopMatrix();
 	glPopMatrix();
 }
 
+// affichage du chiffre romain III
 void displayChiffre3(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
-	//glTranslatef(-7.1, 0.0, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
-	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(6.8, 0.0, 1.5);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
-	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(7.45, 0.0, 1.5);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
-	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(8.1, 0.0, 1.5);
 	glScalef(0.5, 1.4, 0.0);
@@ -797,28 +726,24 @@ void displayChiffre3(void)
 	glPopMatrix();
 
 	glPopMatrix();
+	glPopMatrix();
 }
 
+// affichage du chiffre romain II
 void displayChiffre2(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
-	//glTranslatef(-7.1, 0.0, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
-	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(6.3, 3.5, 1.5);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
-	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(6.95, 3.5, 1.5);
 	glScalef(0.5, 1.4, 0.0);
@@ -826,21 +751,18 @@ void displayChiffre2(void)
 	glPopMatrix();
 
 	glPopMatrix();
+	glPopMatrix();
 }
 
+// affichage du chiffre romain I
 void displayChiffre1(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
-	//glTranslatef(-7.1, 0.0, 1.5);
-	//glRasterPos2f(0.0, 0.0);
-	glPushMatrix();
 
-	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(3.9, 6.6, 1.5);
 	glScalef(0.5, 1.4, 0.0);
@@ -850,9 +772,9 @@ void displayChiffre1(void)
 	glPopMatrix();
 }
 
+// affichage de tous les chiffres
 void displayChiffres(void)
 {
-
 	displayChiffre12();
 	displayChiffre11();
 	displayChiffre10();
@@ -870,38 +792,30 @@ void displayChiffres(void)
 // dessin du disque de la montre
 void displayCadran(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	if (couleur == 11){
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(coefTransparence));
-		printf("couleur jaune \n");
 	}
-	//else
-	//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleu(coefTransparence));
 	if (couleur == 12){
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(coefTransparence));
-		printf("couleur bleu \n");
 	}
 	if (couleur == 13)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCielFonce(coefTransparence));
-	//glScalef(17.0, 5.0, 10.0);
 
 	/* Anneau pour la chaine */
 	glPushMatrix();
 	glTranslatef(0.0, 13.1, 0.75);
-	//glRotatef(90, 1.0, 0.0, 0.0);
 	glutSolidTorus(0.3, 1.2, 50, 50);
 	glPopMatrix();
 
-	/* Bouton pour modifier l'heure */
+	/* Bouton pour modifier l'heure theorique */
 	glPushMatrix();
 	glTranslatef(0.0, 13.0, 0.75);
 	glRotatef(90, 1.0, 0.0, 0.0);
 	glutSolidCylinder(1, 1.5, 50, 50);
-	//glutSolidTorus(0.75, 10.0, 50, 50);
 	glPopMatrix();
 
 	/* Attache au dessus de la montre */
@@ -909,7 +823,6 @@ void displayCadran(void)
 	glTranslatef(0.0, 12.0, 0.75);
 	glRotatef(90, 1.0, 0.0, 0.0);
 	glutSolidCylinder(0.5, 3.0, 50, 50);
-	//glutSolidTorus(0.75, 10.0, 50, 50);
 	glPopMatrix();
 
 	/* Cadran principal */
@@ -926,16 +839,12 @@ void displayCadran(void)
 // dessin du balancier qui sert à reguler le mouvement
 void displayBalancier(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurMagenta(1.2f));
 	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
-	//float angle = (secondes * 6) % 360;
-	//glRotatef(angle - 1, 0.0, 0.0, -0.5);
 	float angle = (secondes % 2 * 12) - 6;
 
 	glPushMatrix();
@@ -955,7 +864,6 @@ void displayBalancier(void)
 		glTranslatef(2.4, 1.05, 0.77);
 	else
 		glTranslatef(2.8, 1.45, 0.77);
-	//glRotatef(angle, 0.0, 0.0, 1.0);
 	glutSolidCylinder(0.03, 0.15, 50, 50);
 	glPopMatrix();
 
@@ -964,12 +872,9 @@ void displayBalancier(void)
 		glTranslatef(2.8, 0.65, 0.77);
 	else
 		glTranslatef(2.4, 1.05, 0.77);
-	//glRotatef(angle, 0.0, 0.0, 1.0);
 	glutSolidCylinder(0.03, 0.15, 50, 50);
-	
 	glPopMatrix();
-	//glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
+
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
@@ -978,17 +883,12 @@ void displayBalancier(void)
 // dessin de l'ancre qui transmet la force
 void displayAncre(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurMagentaFonce(1.2f));
 	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
-	//float angle = (secondes * 6) % 360;
-	//glRotatef(angle - 1, 0.0, 0.0, -0.5);
-
 	
 	glTranslatef(2.3, 1.05, 0.9);
 	if (secondes % 2 == 0)
@@ -1038,23 +938,20 @@ void displayAncre(void)
 	glScalef(0.03, 0.15, 0.04);
 	glutSolidCube(1.0);
 	glPopMatrix();
-	
-	//glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
+
 	glPopMatrix();
 	glPopMatrix();
 }
+
 // dessin de la roue d'échappement qui compte les oscillations du balancier
 void displayRoueEchappement(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurCyanFonce(1.2f));
 	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
 	float angle = (secondes * 15) % 360;
 
 	glPushMatrix();
@@ -1075,76 +972,63 @@ void displayRoueEchappement(void)
 	gear(0.1, 0.2, 0.1, 12, 0.1);
 	glPopMatrix();
 
-	//glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
+	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
 }
 
-// dessin de l'engrenage
+// dessin de l'engrenage des secondes
 void displayEngrenageSecondes(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurRouge(1.2f));
 	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
 	float angle = (secondes * 6) % 360;
 	glRotatef(angle-1, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 0.0, 0.45);
 	gear(0.7, 1.2, 0.15, 30.0, 0.1);
-	//glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
 }
 
-// dessin de l'engrenage
+// dessin de l'engrenage des minutes
 void displayEngrenageMinutes(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleu(1.2f));
 	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
 	float angle = (minutes * 6) % 360;
 	glRotatef(angle - 1, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 0.0, 0.3);
 	gear(0.6, 1.7, 0.15, 30.0, 0.1);
-	//glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
 }
 
-// dessin de l'engrenage
+// dessin de l'engrenage des heures
 void displayEngrenageHeures(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurVert(1.2f));
 	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
 	float angle = (((heures % 12) * 30 + (minutes / 2)) % 360);
 	glRotatef(angle - 1, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 0.0, 0.15);
 	gear(0.5, 2.2, 0.15, 30.0, 0.1);
-	//glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
@@ -1152,31 +1036,21 @@ void displayEngrenageHeures(void)
 
 void displayCouvercle(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	if (couleur == 11)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
-	//else
-	//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleu(1.0f));
 	if (couleur == 12)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(1.0f));
 	if (couleur == 13)
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCielFonce(1.0f));
 	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
 
-	glTranslatef(translateCouvX[animationCouv/5], translateCouvY, translateCouvZ[animationCouv/5]);
-	glRotatef(angleCouv[animationCouv/5], rotateCouvX, rotateCouvY, rotateCouvZ);
-	//printf("animation : %d", animationCouv);
-	//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX[animationCouv], rotateCouvY[animationCouv], rotateCouvZ[animationCouv]);
-	//printf("rotation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY[animationCouv], translateCouvZ[animationCouv]);
-	//glTranslatef(-10.0, 0.0, 10.5);
-	//glRotatef(90, 0.0, -1.0, 0.0);
+	glTranslatef(translateCouvX[animationCouv/2], translateCouvY, translateCouvZ[animationCouv/2]);
+	glRotatef(angleCouv[animationCouv/2], rotateCouvX, rotateCouvY, rotateCouvZ);
 	glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
 	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
@@ -1185,52 +1059,40 @@ void displayCouvercle(void)
 void animationCouvercle(void)
 {
 	angleCouv[1] = 80.0;
-	//translateCouvX[1] = -10.0;
-	//translateCouvZ[1] = 11.4;
 	translateCouvX[1] = -8.;
 	translateCouvZ[1] = 11.4;
-	//glutPostRedisplay();
-	//Sleep(500);
+
 	angleCouv[2] = 70.0;
 	translateCouvX[2] = -6.8;
 	translateCouvZ[2] = 10.9;
-	//glutPostRedisplay();
-	//Sleep(500);
+
 	angleCouv[3] = 60.0;
 	translateCouvX[3] = -5.3;
 	translateCouvZ[3] = 9.8;
-	//glutPostRedisplay();
-	//Sleep(500);
+	
 	angleCouv[4] = 50.0;
 	translateCouvX[4] = -4.;
 	translateCouvZ[4] = 8.8;
-	//glutPostRedisplay();
-	//Sleep(500);
+	
 	angleCouv[5] = 40.0;
 	translateCouvX[5] = -2.9;
 	translateCouvZ[5] = 7.6;
-	//glutPostRedisplay();
-	//Sleep(500);
+	
 	angleCouv[6] = 30.0;
 	translateCouvX[6] = -1.9;
 	translateCouvZ[6] = 6.3;
-	//glutPostRedisplay();
-	//Sleep(500);
+	
 	angleCouv[7] = 20.0;
 	translateCouvX[7] = -1.2;
 	translateCouvZ[7] = 4.7;
-	//glutPostRedisplay();
-	//Sleep(500);
+	
 	angleCouv[8] = 10.0;
 	translateCouvX[8] = -0.5;
 	translateCouvZ[8] = 3.2;
-	//glutPostRedisplay();
-	//Sleep(500);
+	
 	angleCouv[9] = 0.0;
 	translateCouvX[9] = 0.0;
 	translateCouvZ[9] = 1.6;
-	//glutPostRedisplay();
-	
 
 	rotateCouvX = 0.0;	rotateCouvY = -1.0;	rotateCouvZ = 0.0;	
 	translateCouvX[0] = -10.0;	translateCouvY = 0.0;	translateCouvZ[0] = 11.5;
@@ -1240,18 +1102,15 @@ void animationCouvercle(void)
 // dessin du verre
 void displayVerre(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(0.25f));
-	glPushMatrix();
-	//glScalef(9.0, 9.0, 18.0);
+	//glPushMatrix();
 	glTranslatef(0.0, 0.0, 1.5);
 	glutSolidCone(10.0, 0.8, 50, 50);
-	//glutSolidCube(1.0);
-	glPopMatrix();
+	//glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
 }
@@ -1259,7 +1118,6 @@ void displayVerre(void)
 // dessin de l'aiguille des secondes
 void displaySecondes(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
@@ -1267,17 +1125,16 @@ void displaySecondes(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurRouge(2.0f));
 
 	float angle = (secondes * 6) % 360;
-	//printf("%d\n", secondes);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 4.5, 1.51);
 	glScalef(0.5, 4.5, 0.0);
 	glutSolidOctahedron();
-	//glutSolidSphere(1.25, 50, 50);
 	glPopMatrix();
 	glPopMatrix();
 }
 
+// affiche les marquages (triangle) sur les contours du cadran
 void displayMarquages(void)
 {
 	glPushMatrix();
@@ -1286,9 +1143,6 @@ void displayMarquages(void)
 	
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
-
-	//glPushMatrix();
-	//float angle = (instant.tm_min * 6) % 360;
 	int i = 0;
 	for (i = 0; i < 12; i++)
 	{
@@ -1315,16 +1169,12 @@ void displayMarquages(void)
 		}
 	}
 	
-	//glutSolidOctahedron();
-	//glutSolidSphere(1.25, 50, 50);
-	
 	glPopMatrix();
 }
 
 // dessin de l'aiguille des minutes
 void displayMinutes(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
@@ -1332,21 +1182,19 @@ void displayMinutes(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
 	float angle = (minutes * 6) % 360;
-	//printf("salut mintute %d", instant.tm_min);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 4.0, 1.51);
 	glScalef(0.35, 4.0, 0.3);
 	glutSolidOctahedron();
-	//glutSolidSphere(1.25, 50, 50);
+
 	glPopMatrix();
 	glPopMatrix();
 }
 
-// dessin de l'aiguille des minutes
+// dessin de l'aiguille des heures
 void displayHeures(void)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	manipulateurSouris();
 	manipulateurClavier();
@@ -1354,47 +1202,27 @@ void displayHeures(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(2.0f));
 
 	float angle = (((heures %12) * 30 + (minutes/2)) % 360);
-	//printf("%d",instant.tm_min/2);
 	glRotatef(angle, 0.0, 0.0, -0.5);
 
 	glTranslatef(0.0, 3.0, 1.51);
 	glScalef(0.5, 3.0, 0.3);
 	glutSolidOctahedron();
-	//glutSolidSphere(1.25, 50, 50);
+
 	glPopMatrix();
 	glPopMatrix();
 }
 
+// affichage principal
 void display(void)
 {
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glLoadIdentity();
-	
-	switch (couleur)
-	{
-	case 311:
-		// j'affecte la couleur à un materiau
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, rouge);
-		break;
-	case 312:
-		// j'affecte la couleur à un materiau
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, vert);
-		break;
-	case 313:
-		// j'affecte la couleur à un materiau
-		glMaterialfv(GL_FRONT, GL_DIFFUSE, bleu);
-		break;
-	}
 
 	// gestion de la camera tournante
 	gluLookAt(0, 0, distanceCamera, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glRotatef(angley, 1.0, 0.0, 0.0);
 	glRotatef(anglex, 0.0, 1.0, 0.0);
-	//glPushMatrix();
-	//glClearColor(0, 0, 0, 0);
-	//glClear(GL_COLOR_BUFFER_BIT);
-	//glColor3d(0, 0, 0); // Texte en blanc
 	displayChiffres();
 
 	displayCouvercle();
@@ -1415,33 +1243,11 @@ void display(void)
 
 	displayCadran();
 	displayVerre();
-	/*
-	glPushMatrix();
-	displayCrochet();
-	glPopMatrix();
-	*/
-	//glPopMatrix();
+
 	glFlush();
 	glutSwapBuffers();
 
 }
-/*
-void myReshape(int w, int h)
-{
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-
-	glLoadIdentity();
-	glPushMatrix();
-	glTranslatef(0, 0, 25);
-	glOrtho(-50.0, 50.0, -50.0*h / w, 50.0*h / w, -100.0, 100.0);
-	// pour la camera je donne sa position, où elle regarde (point visé) et l'orientation de la tête (vecteur)
-	//gluLookAt(0, 0, 0, 0, 0, 0, 0, 1, 0);
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glLoadIdentity();
-}
-*/
 
 //la gestion du clavier
 void clavier(unsigned char touche, int x, int y)
@@ -1449,71 +1255,53 @@ void clavier(unsigned char touche, int x, int y)
 	
 	switch (touche)
 	{
-		/*
-		// faire tourner la camera
-		
-	case 'z':angle += 2;
-		if (angle >= 360) angle -= 360; glutPostRedisplay(); break;
-	case 'a':angle -= 2;
-		if (angle <= 0) angle += 360; glutPostRedisplay(); break;
-		// allumer et eteindre les lumieres
-	case 'w': glEnable(GL_LIGHT0); glutPostRedisplay(); break;
-	case 'x': glDisable(GL_LIGHT0); glutPostRedisplay(); break;
-	case 'c': glEnable(GL_LIGHT1); glutPostRedisplay(); break;
-	case 'v': glDisable(GL_LIGHT1); glutPostRedisplay(); break;
-		// gestion de la specularité
-	case 'm': Mspec[0] += 0.1; if (Mspec[0] > 1) Mspec[0] = 1;
-		Mspec[1] += 0.1; if (Mspec[1] > 1) Mspec[1] = 1;
-		Mspec[2] += 0.1; if (Mspec[2] > 1) Mspec[2] = 1;
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Mspec);
-		glutPostRedisplay(); break;
-	case 'l': Mspec[0] -= 0.1; if (Mspec[0] < 0) Mspec[0] = 0;
-		Mspec[1] -= 0.1; if (Mspec[1] < 0.9) Mspec[1] = 0.9;
-		Mspec[2] -= 0.1; if (Mspec[2] < 0) Mspec[2] = 0;
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Mspec);
-		glutPostRedisplay(); break;
-		// gestion de la brillance
-	case 'j': Mshiny -= 1; if (Mshiny < 0) Mshiny = 0;
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
-		glutPostRedisplay(); break;
-	case 'k': Mshiny += 1; if (Mshiny > 128) Mshiny = 128;
-		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
-		glutPostRedisplay(); break;
-		*/
-	case '1': numeroTex = 1; break;
-	case '2': numeroTex = 2; break;
-	case '3': numeroTex = 3; break;
+	case '1': numeroTex = 1; printf("texture 1 séléctionnée \n"); break;
+	case '2': numeroTex = 2; printf("texture 2 séléctionnée \n"); break;
+	case '3': numeroTex = 3; printf("texture 3 séléctionnée \n"); break;
 	case 'o': if (open) open = false; else open = true; break;
-		//animationCouv++; break;
+
 	case 'l':
-		if (glIsEnabled(GL_LIGHT0))
+		if (glIsEnabled(GL_LIGHT0)){
 			glDisable(GL_LIGHT0);
-		else
-			glEnable(GL_LIGHT0); 
+			printf(" lumiére rouge éteinte \n");
+		}
+		else{
+			glEnable(GL_LIGHT0);
+			printf(" lumiére rouge allumée \n");
+		}
 		glutPostRedisplay(); break;
 	case 'L':
-		if (glIsEnabled(GL_LIGHT1))
+		if (glIsEnabled(GL_LIGHT1)){
 			glDisable(GL_LIGHT1);
-		else
+			printf(" lumiére bleue éteinte \n");
+		}
+		else{
 			glEnable(GL_LIGHT1);
+			printf(" lumiére bleue allumée \n");
+
+		}
 		glutPostRedisplay(); break;
 	case 'k':
-		if (glIsEnabled(GL_LIGHT2))
+		if (glIsEnabled(GL_LIGHT2)){
 			glDisable(GL_LIGHT2);
-		else
+			printf(" lumiére verte éteinte \n");
+		}
+		else{
 			glEnable(GL_LIGHT2);
+			printf(" lumiére verte allumée \n");
+		}
 		glutPostRedisplay(); break;
 	case 'm': minutes = minutes++ % 60; if (minutes >= 60) minutes -= 60;
-		majTemps();// glutPostRedisplay(); 
+		majTemps();
 		break;
 	case 'M': minutes = minutes-- % 60; if (minutes <= -1){ minutes += 60; }
 		recule = true;
-		majTemps();// glutPostRedisplay(); 
+		majTemps();
 		recule = false;
 		break;
 
 	case 's': secondes = secondes++ % 60;if (secondes >= 60) secondes -= 60;
-		/*tempsSynchro = false;*/ majTemps(); break;
+		majTemps(); break;
 	case 'S': secondes = secondes-- % 60; if (secondes <= -1) secondes += 60;
 		reculeSec = true;
 		majTemps();
@@ -1523,7 +1311,14 @@ void clavier(unsigned char touche, int x, int y)
 	case 'h': heures = heures++ % 24; majTemps(); if (heures >= 24) heures -= 24; break;
 	case 'H': heures = heures-- % 24; majTemps(); if (heures <= -1) heures += 24; break;
 
-	case 't': if (coefTransparence == 1.0) coefTransparence = 0.2; else coefTransparence = 1.0;
+	case 't': if (coefTransparence == 1.0){
+				  coefTransparence = 0.2;
+				  printf(" montre transparente \n");
+				}
+			  else{
+				  coefTransparence = 1.0;
+				  printf(" montre mate \n");
+			  }
 		if (texture) texture = false; else texture = true; break;
 	case 'z': distanceCamera--; break;
 	case 'Z': distanceCamera++; break;
@@ -1556,35 +1351,6 @@ void clavier(unsigned char touche, int x, int y)
 	}
 }
 
-void speciale(int k, int x, int y)
-{
-	printf("test");
-	switch (k)
-	{
-		
-	case GLUT_KEY_UP: yCam = (yCam + 1) % distanceCamera/2;
-		if (yCam >= distanceCamera/2) yCam -= distanceCamera/2; glutPostRedisplay(); break;
-	case GLUT_KEY_DOWN: yCam = (yCam - 2) % 360; 
-		if (yCam <= 0) yCam += 360; glutPostRedisplay(); break;
-	case GLUT_KEY_LEFT: xCam = (xCam + 2) % 360; break;
-	case GLUT_KEY_RIGHT: xCam = (xCam - 2) % 360; break;
-	//case GLUT_KEY_CTRL_L: hand = (hand + 5) % 360; break;
-	//case GLUT_KEY_CTRL_R: hand = (hand - 5) % 360; break;
-	}
-	glutPostRedisplay();
-
-}
-/*
-void calcTabCosSin(void)
-{
-	int i;
-	for (i = 0; i < 360; i++)
-	{
-		Cos[i] = cos((float)i / 100.0*PI);
-		Sin[i] = sin((float)i / 100.0*PI);
-	}
-}*/
-
 // fonction de recalcul de la taille de la fenetre
 void reshape(int x, int y)
 {
@@ -1595,6 +1361,7 @@ void reshape(int x, int y)
 
 }
 
+// fonction de gestion de la souris
 void mouse(int button, int state, int x, int y)
 {
 	/* si on appuie sur le bouton gauche */
@@ -1609,13 +1376,14 @@ void mouse(int button, int state, int x, int y)
 		presse = 0; /* le booleen presse passe a 0 (faux) */
 	if (button == 3){
 		distanceCamera++;
-		printf("dezoom \n");
+		//printf("dezoom \n");
 	}if (button == 4){
 		distanceCamera--;
-		printf("dezoom \n");
+		//printf("dezoom \n");
 	}
 }
 
+// gestion du deplacement de la souris
 void mousemotion(int x, int y)
 {
 	if (presse) /* si le bouton gauche est presse */
@@ -1634,15 +1402,16 @@ void mousemotion(int x, int y)
 	yold = y;
 }
 
+// fonction de selection de couleur associer au menu
 void selectCouleur(int selection) {
 
 	switch (selection) {
 
-	case 11: /* si c&#39;est une des trois premieres valeurs */
+	case 11: /* si c'est une des trois premieres valeurs */
 
 	case 12: 
 
-	case 13: couleur = selection; printf("couleur %d", couleur);
+	case 13: couleur = selection;// printf("couleur %d", couleur);
 
 		break;
 
@@ -1653,6 +1422,7 @@ void selectCouleur(int selection) {
 
 }
 
+// fonction du menu quitter
 void select(int selection) {
 
 	switch (selection) {
@@ -1664,6 +1434,7 @@ void select(int selection) {
 
 }
 
+// fonction principale du programme
 int main(int argc, char** argv)
 {
 	/* Gestion de creation de fenetre*/
@@ -1675,6 +1446,26 @@ int main(int argc, char** argv)
 	glutCreateWindow("Montre OpenGL");
 	myInit();
 
+	printf(" Voici quelques commandes utiles dans l'application : \n");
+	printf(" a : accelere/ralenti le temps \n");
+	printf(" z/Z : zoom et dezoom (également faisable à la souris) \n");
+	printf(" r : remise à l'heure de la montre \n");
+	printf(" t : rend la montre transparente/mate pour voir les mecanismes \n");
+	printf(" o : ouverture/fermeture du couvercle \n");
+	printf(" p : permet de mettre le temps en pause ou de reprendre \n");
+	printf(" s/S : permet d'avancer/reculer l'aiguille des secondes \n");
+	printf(" m/M : permet d'avancer/reculer l'aiguille des minutes \n");
+	printf(" h\H : permet d'avancer/reculer l'aguille des heures \n");
+	printf(" k : permet d'allumer/éteindre la lumière Verte \n");
+	printf(" l : permet d'allumer/éteindre la lumière Rouge \n");
+	printf(" L : permet d'allumer/éteindre la lumière Bleue \n");
+	printf(" 1 : permet de choisir la première texture (par défaut) \n");
+	printf(" 2 : permet de choisir la deuxième texture \n");
+	printf(" 3 : permet de choisir la troisième texture \n");
+	printf(" q : permet de quitter l'application \n");
+	printf(" Un menu est également disponible via le clic droit de la souris \n");
+
+	// on creer un menu pour modifier la couleur de la montre
 	int menuCouleur = glutCreateMenu(selectCouleur);
 	glutAddMenuEntry("Jaune", 11);
 	glutAddMenuEntry("Blanc", 12);
@@ -1685,7 +1476,6 @@ int main(int argc, char** argv)
 	glutAddSubMenu("Couleur", menuCouleur);
 	glutAddMenuEntry("Quitter", 0);
 
-	//creationMenuBasique();
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	// mise en place de la perspective
@@ -1693,22 +1483,19 @@ int main(int argc, char** argv)
 	glLoadIdentity();
 	gluPerspective(45.0, 1.0, 0.1, 500.0); // angle, repport h/w, plan de clipping
 	glMatrixMode(GL_MODELVIEW);
-	animationCouvercle();
-	
-	/* Ne fonctionnne pas pour le deplacement de la camera */
-	//setParametresOrthoBasique(-25.0, 25.0, -25.0, 25.0, -500.0, 500.0);
-	//setManipulateurDistance(0.1f);
-	
+	animationCouvercle();	
 
 	// permet de mettre à jour les aiguilles
 	glutIdleFunc(myIdle);
 
+	// toutes les fonctions necessaire pour gerer les entrées clavier ou souris
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(clavier);
-	glutSpecialFunc(specialBasique);
 	glutMotionFunc(motionBasique);
 	glutMouseFunc(mouse);
 	glutMotionFunc(mousemotion);
+
+	// fonction d'affichage
 	glutDisplayFunc(display);
 	
 	//print du temps systeme
