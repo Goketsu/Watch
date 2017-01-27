@@ -383,7 +383,7 @@ void displayTexture(void)
 	//glTexCoord2f(0.15, 0.85); glVertex3f(-7.4, 7.4, -0.01);
 	glEnd();
 	//glutSwapBuffers();
-	texture = true;
+	//texture = true;
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -874,6 +874,164 @@ void displayCadran(void)
 	glPopMatrix();
 }
 
+// dessin du balancier qui sert à reguler le mouvement
+void displayBalancier(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurMagenta(1.2f));
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	//float angle = (secondes * 6) % 360;
+	//glRotatef(angle - 1, 0.0, 0.0, -0.5);
+	float angle = (secondes % 2 * 12) - 6;
+
+	glPushMatrix();
+	glTranslatef(2.8, 1.05, 0.7);
+	glRotatef(angle, 0.0, 0.0, 1.0);
+	gear(0.1, 0.8, 0.15, 12, 0.1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(2.8, 1.05, 0.75);
+	glRotatef(angle, 0.0, 0.0, 1.0);
+	glutSolidCylinder(0.5, 0.1, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	if (secondes%2 ==0)
+		glTranslatef(2.4, 1.05, 0.77);
+	else
+		glTranslatef(2.8, 1.45, 0.77);
+	//glRotatef(angle, 0.0, 0.0, 1.0);
+	glutSolidCylinder(0.03, 0.15, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	if (secondes%2 == 0)
+		glTranslatef(2.8, 0.65, 0.77);
+	else
+		glTranslatef(2.4, 1.05, 0.77);
+	//glRotatef(angle, 0.0, 0.0, 1.0);
+	glutSolidCylinder(0.03, 0.15, 50, 50);
+	
+	glPopMatrix();
+	//glutSolidCone(10.0, 0.8, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+}
+
+// dessin de l'ancre qui transmet la force
+void displayAncre(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurMagentaFonce(1.2f));
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	//float angle = (secondes * 6) % 360;
+	//glRotatef(angle - 1, 0.0, 0.0, -0.5);
+
+	
+	glTranslatef(2.3, 1.05, 0.9);
+	if (secondes % 2 == 0)
+		glRotatef(65, 0.0, 0.0, 1.0);
+	else
+		glRotatef(-65, 0.0, 0.0, 1.0);
+	glScalef(0.03, 0.7, 0.04);
+	glutSolidCube(1.0);
+
+	glPopMatrix();
+
+	glPushMatrix();
+	if (secondes % 2 == 0){
+		glTranslatef(1.99, 1.2, 0.9);
+		glRotatef(-25, 0.0, 0.0, 1.0);
+	}
+	else{
+		glTranslatef(1.99, 0.9, 0.9);
+		glRotatef(25, 0.0, 0.0, 1.0);
+	}
+	glScalef(0.03, 0.5, 0.04);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	if (secondes % 2 == 0){
+		glTranslatef(2.0, 1.4, 0.91);
+		glRotatef(100, 0.0, 0.0, 1.0);
+	}
+	else{
+		glTranslatef(1.85, 1.05, 0.91);
+		glRotatef(150, 0.0, 0.0, 1.0);
+	}
+	glScalef(0.03, 0.15, 0.04);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	if (secondes % 2 == 0){
+		glTranslatef(1.85, 1.05, 0.91);
+		glRotatef(-150, 0.0, 0.0, 1.0);
+	}
+	else{
+		glTranslatef(2.03, 0.7, 0.91);
+		glRotatef(-100, 0.0, 0.0, 1.0);
+	}
+	glScalef(0.03, 0.15, 0.04);
+	glutSolidCube(1.0);
+	glPopMatrix();
+	
+	//glutSolidCone(10.0, 0.8, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
+	glPopMatrix();
+}
+// dessin de la roue d'échappement qui compte les oscillations du balancier
+void displayRoueEchappement(void)
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurCyanFonce(1.2f));
+	glPushMatrix();
+	//glScalef(9.0, 9.0, 18.0);
+	float angle = (secondes * 15) % 360;
+
+	glPushMatrix();
+	glTranslatef(1.05, 1.05, 0.95);
+	glRotatef(angle - 1, 0.0, 0.0, 0.5);
+	gear(0.1, 0.7, 0.15, 12, 0.3);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.05, 1.05, 0.45);
+	glRotatef(angle - 1, 0.0, 0.0, 0.5);
+	glutSolidCylinder(0.1, 0.6, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(1.05, 1.05, 0.45);
+	glRotatef(angle - 1, 0.0, 0.0, 0.5);
+	gear(0.1, 0.2, 0.1, 12, 0.1);
+	glPopMatrix();
+
+	//glutSolidCone(10.0, 0.8, 50, 50);
+	//glutSolidCube(1.0);
+	glPopMatrix();
+	glPopMatrix();
+}
+
 // dessin de l'engrenage
 void displayEngrenageSecondes(void)
 {
@@ -888,8 +1046,8 @@ void displayEngrenageSecondes(void)
 	float angle = (secondes * 6) % 360;
 	glRotatef(angle-1, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 0.0, 0.9);
-	gear(0.7, 1.2, 0.3, 30.0, 0.1);
+	glTranslatef(0.0, 0.0, 0.45);
+	gear(0.7, 1.2, 0.15, 30.0, 0.1);
 	//glutSolidCone(10.0, 0.8, 50, 50);
 	//glutSolidCube(1.0);
 	glPopMatrix();
@@ -911,8 +1069,8 @@ void displayEngrenageMinutes(void)
 	float angle = (minutes * 6) % 360;
 	glRotatef(angle - 1, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 0.0, 0.6);
-	gear(0.6, 1.7, 0.3, 30.0, 0.1);
+	glTranslatef(0.0, 0.0, 0.3);
+	gear(0.6, 1.7, 0.15, 30.0, 0.1);
 	//glutSolidCone(10.0, 0.8, 50, 50);
 	//glutSolidCube(1.0);
 	glPopMatrix();
@@ -934,8 +1092,8 @@ void displayEngrenageHeures(void)
 	float angle = (((heures % 12) * 30 + (minutes / 2)) % 360);
 	glRotatef(angle - 1, 0.0, 0.0, -0.5);
 
-	glTranslatef(0.0, 0.0, 0.3);
-	gear(0.5, 2.2, 0.3, 30.0, 0.1);
+	glTranslatef(0.0, 0.0, 0.15);
+	gear(0.5, 2.2, 0.15, 30.0, 0.1);
 	//glutSolidCone(10.0, 0.8, 50, 50);
 	//glutSolidCube(1.0);
 	glPopMatrix();
@@ -1175,8 +1333,11 @@ void display(void)
 	displayEngrenageSecondes();
 	displayEngrenageMinutes();
 	displayEngrenageHeures();
-	
-	//if (!texture)
+	displayBalancier();
+	displayAncre();
+	displayRoueEchappement();
+
+	if (!texture)
 		displayTexture();
 
 	displayCadran();
@@ -1272,9 +1433,10 @@ void clavier(unsigned char touche, int x, int y)
 		break;
 
 	case 'h': heures = heures++ % 24; majTemps(); if (heures >= 24) heures -= 24; break;
-	case 'H': heures = heures-- % 24; majTemps(); if (heures >= 24) heures -= 24; break;
+	case 'H': heures = heures-- % 24; majTemps(); if (heures <= -1) heures += 24; break;
 
-	case 't': if (coefTransparence == 1.0) coefTransparence = 0.2; else coefTransparence = 1.0; break;
+	case 't': if (coefTransparence == 1.0) coefTransparence = 0.2; else coefTransparence = 1.0;
+		if (texture) texture = false; else texture = true; break;
 	case 'z': distanceCamera--; break;
 	case 'Z': distanceCamera++; break;
 	case 'r': heures = instant.tm_hour;
