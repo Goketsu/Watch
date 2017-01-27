@@ -17,7 +17,11 @@
 #include "loadppm.h"
 
 char texFileName[] = "hexagonalTrianglesRotate.ppm";
+char texFileName2[] = "hexagonalTrianglesRotate2.ppm";
+char texFileName3[] = "hexagonalTrianglesRotate3.ppm";
 PPMImage *image;
+
+int numeroTex = 1;
 
 GLfloat minX = 0.0, maxX = 1.0;
 bool texture = false;
@@ -354,6 +358,18 @@ static void gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 
 void displayTexture(void)
 {
+	if (numeroTex == 1)
+		image = new PPMImage(texFileName);
+	else if (numeroTex == 2)
+		image = new PPMImage(texFileName2);
+	else
+		image = new PPMImage(texFileName3);
+
+	
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image->sizeX, image->sizeY,
+		GL_RGB, GL_UNSIGNED_BYTE, image->data);
+	delete image;
+	
 	glEnable(GL_TEXTURE_2D);
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	/*glBegin(GL_QUADS);
@@ -1407,6 +1423,9 @@ void clavier(unsigned char touche, int x, int y)
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Mshiny);
 		glutPostRedisplay(); break;
 		*/
+	case '1': numeroTex = 1; break;
+	case '2': numeroTex = 2; break;
+	case '3': numeroTex = 3; break;
 	case 'o': if (open) open = false; else open = true; break;
 		//animationCouv++; break;
 	case 'l':
