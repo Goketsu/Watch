@@ -14,6 +14,13 @@
 #include "ModuleManipulateur.h"
 #include "ModuleMenus.h"
 #include "ModuleReshape.h"
+#include "loadppm.h"
+
+char texFileName[] = "hexagonalTrianglesRotate.ppm";
+PPMImage *image;
+
+GLfloat minX = 0.0, maxX = 1.0;
+bool texture = false;
 
 static struct tm instant;
 int heures, minutes, secondes;
@@ -182,6 +189,27 @@ void myIdle(void)
 // gestion des lumieres et melanges
 void myInit(void)
 {
+	image = new PPMImage(texFileName);
+	
+	//glClearColor(0.0, 0.0, 0.0, 0.0);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, image->sizeX, image->sizeY,
+		GL_RGB, GL_UNSIGNED_BYTE, image->data);
+	delete image;
+	
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glEnable(GL_TEXTURE_2D);
+	glShadeModel(GL_FLAT);
+	
 	GLfloat light_position[] = { 1.0, 1.0, 20.0, 0.0 };
 	glEnable(GL_LIGHTING);
 	// on defini les parametres de la source 0
@@ -204,6 +232,8 @@ void myInit(void)
 
 	// façon de gerer le modele d'eclairage
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+	
 
 }
 
@@ -320,6 +350,41 @@ static void gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 	}
 	glEnd();
 
+}
+
+void displayTexture(void)
+{
+	glEnable(GL_TEXTURE_2D);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	/*glBegin(GL_QUADS);
+	glTexCoord2f(minX, 0.0); glVertex3f(-10.0, -10.0, -0.01);
+	glTexCoord2f(minX, 1.0); glVertex3f(-10.0, 10.0,- 0.01);
+	glTexCoord2f(maxX, 1.0); glVertex3f(10.0, 10.0, -0.01);
+	glTexCoord2f(maxX, 0.0); glVertex3f(10.0, -10.0, -0.01);
+	
+	glBegin(GL_POLYGON);
+	glTexCoord2f(0.0, 0.5); glVertex3f(-10.0, 0.0, -0.01);
+	glTexCoord2f(0.15, 0.15); glVertex3f(-7.4, -7.4, -0.01);
+	glTexCoord2f(0.5, 0.0); glVertex3f(0.0, -10.0, -0.01);
+	glTexCoord2f(0.85, 0.15); glVertex3f(7.4, -7.4, -0.01);
+	glTexCoord2f(1.0, 0.5); glVertex3f(10.0, 0.0, -0.01);
+	glTexCoord2f(0.85, 0.85); glVertex3f(7.4, 7.4, -0.01);
+	glTexCoord2f(0.5, 1.0); glVertex3f(0.0, 10.0, -0.01);
+	glTexCoord2f(0.15, 0.85); glVertex3f(-7.4, 7.4, -0.01);
+	*/
+	glBegin(GL_POLYGON);
+	glTexCoord2f(0.05, 0.75); glVertex3f(-8.0, 4.4, -0.01);
+	glTexCoord2f(0.05, 0.25); glVertex3f(-8.0, -5.4, -0.01);
+	glTexCoord2f(0.5, 0.0); glVertex3f(0.0, -10.0, -0.01);
+	glTexCoord2f(0.95, 0.25); glVertex3f(8, -5.4, -0.01);
+	//glTexCoord2f(1.0, 0.5); glVertex3f(10.0, 0.0, -0.01);
+	glTexCoord2f(0.95, 0.75); glVertex3f(8, 4.6, -0.01);
+	glTexCoord2f(0.5, 1.0); glVertex3f(0.0, 10.0, -0.01);
+	//glTexCoord2f(0.15, 0.85); glVertex3f(-7.4, 7.4, -0.01);
+	glEnd();
+	//glutSwapBuffers();
+	texture = true;
+	glDisable(GL_TEXTURE_2D);
 }
 
 /* Fonction qui ne fonctionne pas avec les autres ?MYSTERE? 
@@ -1110,6 +1175,10 @@ void display(void)
 	displayEngrenageSecondes();
 	displayEngrenageMinutes();
 	displayEngrenageHeures();
+	
+	//if (!texture)
+		displayTexture();
+
 	displayCadran();
 	displayVerre();
 	/*

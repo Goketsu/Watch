@@ -64,6 +64,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\TextureOpenGL\TextureOpenGL\loadppm.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ModuleCouleurs.cpp" />
     <ClCompile Include="ModuleManipulateur.cpp" />
@@ -74,6 +75,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="loadppm.h" />
     <ClInclude Include="ModuleCouleurs.h" />
     <ClInclude Include="ModuleManipulateur.h" />
     <ClInclude Include="ModuleMenus.h" />
