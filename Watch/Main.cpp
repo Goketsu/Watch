@@ -1255,40 +1255,40 @@ void clavier(unsigned char touche, int x, int y)
 	
 	switch (touche)
 	{
-	case '1': numeroTex = 1; printf("texture 1 séléctionnée \n"); break;
-	case '2': numeroTex = 2; printf("texture 2 séléctionnée \n"); break;
-	case '3': numeroTex = 3; printf("texture 3 séléctionnée \n"); break;
+	case '1': numeroTex = 1; printf("texture 1 selectionnee \n"); break;
+	case '2': numeroTex = 2; printf("texture 2 selectionnee \n"); break;
+	case '3': numeroTex = 3; printf("texture 3 selectionnee \n"); break;
 	case 'o': if (open) open = false; else open = true; break;
 
 	case 'l':
 		if (glIsEnabled(GL_LIGHT0)){
 			glDisable(GL_LIGHT0);
-			printf(" lumiére rouge éteinte \n");
+			printf(" lumiere rouge eteinte \n");
 		}
 		else{
 			glEnable(GL_LIGHT0);
-			printf(" lumiére rouge allumée \n");
+			printf(" lumiere rouge allumee \n");
 		}
 		glutPostRedisplay(); break;
 	case 'L':
 		if (glIsEnabled(GL_LIGHT1)){
 			glDisable(GL_LIGHT1);
-			printf(" lumiére bleue éteinte \n");
+			printf(" lumiere bleue eteinte \n");
 		}
 		else{
 			glEnable(GL_LIGHT1);
-			printf(" lumiére bleue allumée \n");
+			printf(" lumiere bleue allumee \n");
 
 		}
 		glutPostRedisplay(); break;
 	case 'k':
 		if (glIsEnabled(GL_LIGHT2)){
 			glDisable(GL_LIGHT2);
-			printf(" lumiére verte éteinte \n");
+			printf(" lumiere verte eteinte \n");
 		}
 		else{
 			glEnable(GL_LIGHT2);
-			printf(" lumiére verte allumée \n");
+			printf(" lumiere verte allumee \n");
 		}
 		glutPostRedisplay(); break;
 	case 'm': minutes = minutes++ % 60; if (minutes >= 60) minutes -= 60;
@@ -1326,7 +1326,7 @@ void clavier(unsigned char touche, int x, int y)
 		minutes = instant.tm_min;
 		secondes = instant.tm_sec;
 		tempsSynchro = true;
-		printf(" remise à l'heure \n");
+		printf(" remise a l'heure \n");
 		break;
 	case 'a': if (rapide == false){
 				  rapide = true;
@@ -1448,7 +1448,7 @@ int main(int argc, char** argv)
 
 	printf(" Voici quelques commandes utiles dans l'application : \n");
 	printf(" a : accelere/ralenti le temps \n");
-	printf(" z/Z : zoom et dezoom (également faisable à la souris) \n");
+	printf(" z/Z : zoom et dezoom (egalement faisable à la souris) \n");
 	printf(" r : remise à l'heure de la montre \n");
 	printf(" t : rend la montre transparente/mate pour voir les mecanismes \n");
 	printf(" o : ouverture/fermeture du couvercle \n");
@@ -1456,12 +1456,12 @@ int main(int argc, char** argv)
 	printf(" s/S : permet d'avancer/reculer l'aiguille des secondes \n");
 	printf(" m/M : permet d'avancer/reculer l'aiguille des minutes \n");
 	printf(" h\H : permet d'avancer/reculer l'aguille des heures \n");
-	printf(" k : permet d'allumer/éteindre la lumière Verte \n");
-	printf(" l : permet d'allumer/éteindre la lumière Rouge \n");
-	printf(" L : permet d'allumer/éteindre la lumière Bleue \n");
-	printf(" 1 : permet de choisir la première texture (par défaut) \n");
-	printf(" 2 : permet de choisir la deuxième texture \n");
-	printf(" 3 : permet de choisir la troisième texture \n");
+	printf(" k : permet d'allumer/éteindre la lumiere Verte \n");
+	printf(" l : permet d'allumer/éteindre la lumiere Rouge \n");
+	printf(" L : permet d'allumer/éteindre la lumiere Bleue \n");
+	printf(" 1 : permet de choisir la premiere texture (par défaut) \n");
+	printf(" 2 : permet de choisir la deuxieme texture \n");
+	printf(" 3 : permet de choisir la troisieme texture \n");
 	printf(" q : permet de quitter l'application \n");
 	printf(" Un menu est également disponible via le clic droit de la souris \n");
 
