@@ -363,7 +363,7 @@ void displayChiffre(void)
 	glPopMatrix();
 }
 
-void displayChiffre2(void)
+void displayChiffre12(void)
 {
 	glPushMatrix();
 	manipulateurSouris();
@@ -371,7 +371,7 @@ void displayChiffre2(void)
 	glPushMatrix();
 	//glRasterPos2f(0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
-	glTranslatef(-0.8, 7.0, 1.5);
+	glTranslatef(-0.8, 7.8, 1.5);
 	//glRasterPos2f(0.0, 0.0);
 	glPushMatrix();
 
@@ -383,23 +383,385 @@ void displayChiffre2(void)
 	glRotatef(45, 0.0, 0.0, 1.0);
 	glScalef(0.5, 1.5, 0.0);
 	glutSolidCube(1.0);
-	//glutSolidCube(1.0);
-	//glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, 'X');
-	//glutBitmapString(GLUT_BITMAP_TIMES_ROMAN_24, douze);
+	
 	glPopMatrix();
 	glPushMatrix();
-	glTranslatef(0.2, 7.0, 1.5);
+	glTranslatef(0.2, 7.8, 1.5);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.85, 7.0, 1.5);
+	glTranslatef(0.85, 7.8, 1.5);
 	glScalef(0.5, 1.4, 0.0);
 	glutSolidCube(1.0);
 	glPopMatrix();
 
 	glPopMatrix();
+}
+
+void displayChiffre11(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(-3.9, 6.6, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(45, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glRotatef(45, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(-2.85, 6.6, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+	
+	glPopMatrix();
+}
+
+void displayChiffre10(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(-6.5, 3.5, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(45, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glRotatef(45, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	
+	glPopMatrix();
+}
+
+void displayChiffre9(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(-7.1, 0.0, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(45, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glRotatef(45, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(-8.1, 0.0, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void displayChiffre8(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(-6.7, -3.7, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(30, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glTranslatef(-0.6, 0.0, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-5.7, -3.7, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-5.1, -3.7, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-4.5, -3.7, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+
+	glPopMatrix();
+}
+
+void displayChiffre7(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(-3.9, -6.6, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(30, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glTranslatef(-0.6, 0.0, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-2.9, -6.6, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix(); 
+	
+	glPushMatrix();
+	glTranslatef(-2.3, -6.6, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+
+	glPopMatrix();
+}
+
+void displayChiffre6(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(-0.5, -7.8, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(30, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glTranslatef(-0.6, 0.0, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.5, -7.8, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void displayChiffre5(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(3.9, -6.6, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(30, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glTranslatef(-0.6, 0.0, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void displayChiffre4(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	glTranslatef(6.7, -3.7, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glRotatef(30, 0.0, 0.0, -1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glTranslatef(-0.6, 0.0, 0.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+	glScalef(0.5, 1.5, 0.0);
+	glutSolidCube(1.0); 
+	glPopMatrix();
+	
+	glPushMatrix();
+	glTranslatef(5.2, -3.7, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+	
+	glPopMatrix();
+}
+
+void displayChiffre3(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	//glTranslatef(-7.1, 0.0, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(6.8, 0.0, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(7.45, 0.0, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(8.1, 0.0, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void displayChiffre2(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	//glTranslatef(-7.1, 0.0, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(6.3, 3.5, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(6.95, 3.5, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void displayChiffre1(void)
+{
+	glPushMatrix();
+	manipulateurSouris();
+	manipulateurClavier();
+	glPushMatrix();
+	//glRasterPos2f(0.0, 0.0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurNoir(1.0f));
+	//glTranslatef(-7.1, 0.0, 1.5);
+	//glRasterPos2f(0.0, 0.0);
+	glPushMatrix();
+
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(3.9, 6.6, 1.5);
+	glScalef(0.5, 1.4, 0.0);
+	glutSolidCube(1.0);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void displayChiffres(void)
+{
+
+	displayChiffre12();
+	displayChiffre11();
+	displayChiffre10();
+	displayChiffre9();
+	displayChiffre8();
+	displayChiffre7();
+	displayChiffre6();
+	displayChiffre5();
+	displayChiffre4();
+	displayChiffre3();
+	displayChiffre2();
+	displayChiffre1();
 }
 
 // dessin du disque de la montre
@@ -737,7 +1099,7 @@ void display(void)
 	//glClearColor(0, 0, 0, 0);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	//glColor3d(0, 0, 0); // Texte en blanc
-	displayChiffre2();
+	displayChiffres();
 
 	displayCouvercle();
 	displaySecondes();
