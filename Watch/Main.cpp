@@ -220,8 +220,20 @@ void myInit(void)
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, couleurNoir());
 	glLightfv(GL_LIGHT0, GL_SPECULAR, couleurNoir());
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, couleurBlanc());
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, couleurRouge());
 	glEnable(GL_LIGHT0);
+	// on defini les parametres de la source 1
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, couleurNoir());
+	glLightfv(GL_LIGHT1, GL_SPECULAR, couleurNoir());
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, couleurBleu());
+	glEnable(GL_LIGHT1);
+	// on defini les parametres de la source 2
+	glLightfv(GL_LIGHT2, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT2, GL_AMBIENT, couleurNoir());
+	glLightfv(GL_LIGHT2, GL_SPECULAR, couleurNoir());
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, couleurVert());
+	glEnable(GL_LIGHT2);
 
 	// definition de façon de traiter les faces
 	glEnable(GL_AUTO_NORMAL);
@@ -1433,6 +1445,18 @@ void clavier(unsigned char touche, int x, int y)
 			glDisable(GL_LIGHT0);
 		else
 			glEnable(GL_LIGHT0); 
+		glutPostRedisplay(); break;
+	case 'L':
+		if (glIsEnabled(GL_LIGHT1))
+			glDisable(GL_LIGHT1);
+		else
+			glEnable(GL_LIGHT1);
+		glutPostRedisplay(); break;
+	case 'k':
+		if (glIsEnabled(GL_LIGHT2))
+			glDisable(GL_LIGHT2);
+		else
+			glEnable(GL_LIGHT2);
 		glutPostRedisplay(); break;
 	case 'm': minutes = minutes++ % 60; if (minutes >= 60) minutes -= 60;
 		majTemps();// glutPostRedisplay(); 
