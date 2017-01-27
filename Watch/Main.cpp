@@ -26,6 +26,11 @@ int numeroTex = 1;
 GLfloat minX = 0.0, maxX = 1.0;
 bool texture = false;
 
+static int couleur = 11;
+GLfloat rouge[] = { 1.0, 0.0, 0.0, 0.5 };
+GLfloat vert[] = { 0.0, 1.0, 0.0, 0.5 };
+GLfloat bleu[] = { 0.0, 0.0, 1.0, 0.5 };
+
 static struct tm instant;
 int heures, minutes, secondes;
 bool open = true, pause = false;
@@ -122,7 +127,7 @@ void myIdle(void)
 	if (open == false){
 		if (animationCouv < 45){
 			animationCouv++;
-			printf(" animation : %d", animationCouv/5);
+			//printf(" animation : %d", animationCouv/5);
 			//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
 			//printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
 		}
@@ -130,7 +135,7 @@ void myIdle(void)
 	if (open == true){
 		if (animationCouv > 0){
 			animationCouv--;
-			printf(" animation : %d", animationCouv);
+			//printf(" animation : %d", animationCouv);
 			//printf("rotation : %f, %f, %f, %f", angleCouv[animationCouv], rotateCouvX, rotateCouvY, rotateCouvZ);
 			//printf("translation : %f, %f, %f", translateCouvX[animationCouv], translateCouvY, translateCouvZ[animationCouv]);
 		}
@@ -179,7 +184,7 @@ void myIdle(void)
 			*/
 			
 		}
-		printf("test %d \n", secondes);
+		//printf("test %d \n", secondes);
 		
 		//float angle = (instant.tm_sec / 10) % 360;
 	}
@@ -425,8 +430,13 @@ void displayCrochet(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
-
+	//if (couleur = 11)
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
+	/*if (couleur = 12)
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCiel(1.0f));
+	if (couleur = 13)
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCielFonce(1.0f));
+*/
 	glPushMatrix();
 	glTranslatef(0.0, 0.0, 5.0);
 	glRotatef(90, 1.0, 0.0, 0.0);
@@ -865,7 +875,18 @@ void displayCadran(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(coefTransparence));
+	if (couleur == 11){
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(coefTransparence));
+		printf("couleur jaune \n");
+	}
+	//else
+	//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleu(coefTransparence));
+	if (couleur == 12){
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(coefTransparence));
+		printf("couleur bleu \n");
+	}
+	if (couleur == 13)
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCielFonce(coefTransparence));
 	//glScalef(17.0, 5.0, 10.0);
 
 	/* Anneau pour la chaine */
@@ -1136,7 +1157,14 @@ void displayCouvercle(void)
 	manipulateurSouris();
 	manipulateurClavier();
 	glPushMatrix();
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
+	if (couleur == 11)
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurJauneClair(1.0f));
+	//else
+	//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleu(1.0f));
+	if (couleur == 12)
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBlanc(1.0f));
+	if (couleur == 13)
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, couleurBleuCielFonce(1.0f));
 	glPushMatrix();
 	//glScalef(9.0, 9.0, 18.0);
 
@@ -1342,6 +1370,23 @@ void display(void)
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 	glLoadIdentity();
+	
+	switch (couleur)
+	{
+	case 311:
+		// j'affecte la couleur à un materiau
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, rouge);
+		break;
+	case 312:
+		// j'affecte la couleur à un materiau
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, vert);
+		break;
+	case 313:
+		// j'affecte la couleur à un materiau
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, bleu);
+		break;
+	}
+
 	// gestion de la camera tournante
 	gluLookAt(0, 0, distanceCamera, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	glRotatef(angley, 1.0, 0.0, 0.0);
@@ -1589,6 +1634,36 @@ void mousemotion(int x, int y)
 	yold = y;
 }
 
+void selectCouleur(int selection) {
+
+	switch (selection) {
+
+	case 11: /* si c&#39;est une des trois premieres valeurs */
+
+	case 12: 
+
+	case 13: couleur = selection; printf("couleur %d", couleur);
+
+		break;
+
+	case 0: exit(0);
+	}
+
+	glutPostRedisplay();
+
+}
+
+void select(int selection) {
+
+	switch (selection) {
+
+	case 0: exit(0);
+	}
+
+	glutPostRedisplay();
+
+}
+
 int main(int argc, char** argv)
 {
 	/* Gestion de creation de fenetre*/
@@ -1599,7 +1674,19 @@ int main(int argc, char** argv)
 	glutInitWindowSize(400, 350);
 	glutCreateWindow("Montre OpenGL");
 	myInit();
-	creationMenuBasique();
+
+	int menuCouleur = glutCreateMenu(selectCouleur);
+	glutAddMenuEntry("Jaune", 11);
+	glutAddMenuEntry("Blanc", 12);
+	glutAddMenuEntry("Bleu", 13);
+
+	/* et on lie les sous-menus */
+	glutCreateMenu(select);
+	glutAddSubMenu("Couleur", menuCouleur);
+	glutAddMenuEntry("Quitter", 0);
+
+	//creationMenuBasique();
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	// mise en place de la perspective
 	glMatrixMode(GL_PROJECTION);
