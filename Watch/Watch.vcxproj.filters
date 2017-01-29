@@ -30,7 +30,7 @@
     <ClCompile Include="ModuleReshape.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\TextureOpenGL\TextureOpenGL\loadppm.cpp">
+    <ClCompile Include="loadppm.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
